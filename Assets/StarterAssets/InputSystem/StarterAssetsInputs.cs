@@ -44,10 +44,5 @@ namespace StarterAssets
         {
             throwObject = throwObjectState;
         }
-
-
-
-
     }
-
 }

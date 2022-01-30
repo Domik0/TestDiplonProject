@@ -139,9 +139,9 @@ namespace StarterAssets
                 GroundedCheck();
                 Move();
                 Dance();
+                Beating();
             }
             Climbing();
-            Beating();
         }
 
         private void Beating()
@@ -173,8 +173,6 @@ namespace StarterAssets
                 }
             }
         }
-
-
 
         private void LateUpdate()
 		{
