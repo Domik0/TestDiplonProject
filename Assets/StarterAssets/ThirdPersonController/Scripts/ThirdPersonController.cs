@@ -19,6 +19,8 @@ namespace StarterAssets
 		public float MoveSpeed = 2.0f;
 		[Tooltip("Sprint speed of the character in m/s")]
 		public float SprintSpeed = 5.335f;
+        [Tooltip("Climbing speed of the character in m/s")]
+        public float ClimbingSpeed = 0.5f;
 		[Tooltip("How fast the character turns to face movement direction")]
 		[Range(0.0f, 0.3f)]
 		public float RotationSmoothTime = 0.12f;
@@ -126,11 +128,14 @@ namespace StarterAssets
 		private void Update()
 		{
 			_hasAnimator = TryGetComponent(out _animator);
-			
-			JumpAndGravity();
-			GroundedCheck();
-			Move();
-            Dance();
+
+            if (!_climbing)
+            {
+                JumpAndGravity();
+                GroundedCheck();
+                Move();
+                Dance();
+            }
             Climbing();
 		}
 
@@ -162,6 +167,8 @@ namespace StarterAssets
 			if (_hasAnimator)
 			{
 				_animator.SetBool(_animIDGrounded, Grounded);
+                _animator.SetBool(_animIDClimbingUp, false);
+                _animator.SetBool(_animIDClimbingDown, false);
 			}
 		}
 
@@ -377,7 +384,7 @@ namespace StarterAssets
         {
 			if(col.gameObject.tag == "Ladder")
             {
-                //_climbingZone = true;
+                _climbingZone = true;
                 _climbing = true;
 			}
 		}
@@ -386,9 +393,8 @@ namespace StarterAssets
         {
             if (col.gameObject.tag == "Ladder")
             {
-                //_climbingZone = false;
+                _climbingZone = false;
                 _climbing = false;
-
             }
 		}
 
@@ -400,20 +406,17 @@ namespace StarterAssets
 
 			if (vectorClimbing > 0)
             {
+                _climbing = true;
 				_animator.SetBool(_animIDClimbingUp, true);
                 _animator.SetBool(_animIDClimbingDown, false);
-                _controller.Move(Vector3.up);
+                _controller.Move(Vector3.up.normalized * (ClimbingSpeed * Time.deltaTime));
             }
             else if (vectorClimbing < 0)
             {
-                _animator.SetBool(_animIDClimbingUp, false);
-                _animator.SetBool(_animIDClimbingDown, true);
-                _controller.Move(Vector3.down);
-			}
-            else
-            {
+                _climbing = true;
 				_animator.SetBool(_animIDClimbingUp, false);
-                _animator.SetBool(_animIDClimbingDown, false);
+                _animator.SetBool(_animIDClimbingDown, true);
+                _controller.Move(Vector3.down.normalized * (ClimbingSpeed * Time.deltaTime));
 			}
 		}
 	}
