@@ -39,6 +39,9 @@ namespace StarterAssets
         [Tooltip("Time required to perform the dance")]
         public float DanceTimeout = 0.30f;
 
+        public float PunchTimeout = 0.1f;
+
+
 		[Header("Player Grounded")]
 		[Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
 		public bool Grounded = true;
@@ -79,6 +82,7 @@ namespace StarterAssets
 		private float _jumpTimeoutDelta;
 		private float _fallTimeoutDelta;
         private float _danceTimeoutDelta;
+        private float _punchTimeoutDelta;
 
 		// animation IDs
 		private int _animIDSpeed;
@@ -121,7 +125,7 @@ namespace StarterAssets
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
-		}
+        }
 
 		private void Update()
 		{
@@ -132,9 +136,42 @@ namespace StarterAssets
 			Move();
             Dance();
             Climbing();
-		}
+            Beating();
+        }
 
-		private void LateUpdate()
+        private void Beating()
+        {
+            if (_input.punch)
+            {
+                if (_hasAnimator && _punchTimeoutDelta <= 0.0f)
+                {
+                    _animator.SetTrigger("Punch");
+                    _punchTimeoutDelta = PunchTimeout;
+				}
+
+                if (_punchTimeoutDelta >= 0.0f)
+                {
+                    _punchTimeoutDelta -= Time.deltaTime;
+                }
+            }
+
+
+        }
+
+		private void Throwing()
+        {
+            if (_input.throwObject)
+            {
+                if (_hasAnimator)
+                {
+					
+                }
+            }
+        }
+
+
+
+        private void LateUpdate()
 		{
 			CameraRotation();
 		}
@@ -197,7 +234,7 @@ namespace StarterAssets
 			float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
 
 			float speedOffset = 0.1f;
-			float inputMagnitude = _input.analogMovement ? _input.move.magnitude : 1f;
+			float inputMagnitude =/* _input.analogMovement ? _input.move.magnitude :*/ 1f;
 
 			// accelerate or decelerate to target speed
 			if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
@@ -392,7 +429,21 @@ namespace StarterAssets
             }
 		}
 
-        private void Climbing()
+        void OnControllerColliderHit(ControllerColliderHit hit)
+        {
+            switch (hit.gameObject.tag)
+            {
+				case "Trampoline":
+                    JumpHeight = 2f;
+                    _input.jump = true;
+                    break;
+				default:
+                    JumpHeight = 1.2f;
+					break;
+            }
+        }
+
+		private void Climbing()
         {
             if (!_climbingZone) return;
 
