@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CinemachineTarget
   - Ladder
+  - Trampoline
   layers:
   - Default
   - TransparentFX

@@ -11,85 +11,43 @@ namespace StarterAssets
 		public Vector2 move;
 		public Vector2 look;
 		public bool jump;
-		//public bool sprint;
+        public bool punch;
         public int dance;
+        public bool throwObject;
 
-		[Header("Movement Settings")]
-		public bool analogMovement;
+        public void MoveInput(Vector2 newMoveDirection)
+        {
+            move = newMoveDirection;
+        }
 
-#if !UNITY_IOS || !UNITY_ANDROID
-		[Header("Mouse Cursor Settings")]
-		public bool cursorLocked = true;
-		public bool cursorInputForLook = true;
-#endif
+        public void LookInput(Vector2 newLookDirection)
+        {
+            look = newLookDirection;
+        }
 
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-		public void OnMove(InputValue value)
-		{
-			MoveInput(value.Get<Vector2>());
-		}
-
-		public void OnLook(InputValue value)
-		{
-			if(cursorInputForLook)
-			{
-				LookInput(value.Get<Vector2>());
-			}
-		}
-
-		public void OnJump(InputValue value)
-		{
-			JumpInput(value.isPressed);
-		}
-
-		//public void OnSprint(InputValue value)
-		//{
-		//	SprintInput(value.isPressed);
-		//}
-#else
-	// old input sys if we do decide to have it (most likely wont)...
-#endif
-
-
-		public void MoveInput(Vector2 newMoveDirection)
-		{
-			move = newMoveDirection;
-		} 
-
-		public void LookInput(Vector2 newLookDirection)
-		{
-			look = newLookDirection;
-		}
-
-		public void JumpInput(bool newJumpState)
-		{
-			jump = newJumpState;
-		}
-
-		//public void SprintInput(bool newSprintState)
-		//{
-		//	sprint = newSprintState;
-		//}
+        public void JumpInput(bool newJumpState)
+        {
+            jump = newJumpState;
+        }
 
         public void DanceInput(int newDanceIdState)
         {
             dance = newDanceIdState;
         }
 
-#if !UNITY_IOS || !UNITY_ANDROID
+        public void PunchInput(bool punchState)
+        {
+            punch = punchState;
+        }
 
-		private void OnApplicationFocus(bool hasFocus)
-		{
-			SetCursorState(cursorLocked);
-		}
+        public void ThrowObjectInput(bool throwObjectState)
+        {
+            throwObject = throwObjectState;
+        }
 
-		private void SetCursorState(bool newState)
-		{
-			Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
-		}
 
-#endif
 
-	}
-	
+
+    }
+
 }

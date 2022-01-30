@@ -23,14 +23,21 @@ namespace StarterAssets
             starterAssetsInputs.JumpInput(virtualJumpState);
         }
 
-        //public void VirtualSprintInput(bool virtualSprintState)
-        //{
-        //    starterAssetsInputs.SprintInput(virtualSprintState);
-        //}
-
         public void VirtualDance(bool virtualDanceState)
         {
             starterAssetsInputs.DanceInput(Random.Range(1, 7));
         }
+
+        public void VirtualPunch(bool virtualPunchState)
+        {
+            starterAssetsInputs.PunchInput(virtualPunchState);
+        }
+
+        public void VirtualThrow(bool virtualThrowState)
+        {
+            starterAssetsInputs.ThrowObjectInput(virtualThrowState);
+        }
     }
+
 }
+
