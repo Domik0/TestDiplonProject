@@ -7,6 +7,8 @@ public class Destruction : MonoBehaviour
     public float delay = 3f;
 
     private float countdown;
+    private bool hasExploaded = false;
+    public GameObject explosionEffect;
 
     void Start()
     {
@@ -17,15 +19,18 @@ public class Destruction : MonoBehaviour
     void Update()
     {
         countdown -= Time.deltaTime;
-        if (countdown <= 0f)
+        if (countdown <= 0f && hasExploaded == false)
         {
             Explode();
+            hasExploaded = true;
         }
 
     }
 
     private void Explode()
     {
-        Debug.Log("ÊÀÁÓÌ");
+        Instantiate(explosionEffect, transform.position, transform.rotation);
+
+        Destroy(gameObject);
     }
 }
