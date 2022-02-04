@@ -52,6 +52,7 @@ namespace StarterAssets
 
         public float PunchTimeout = 0.1f;
 
+        public GameObject inventoryObject;
 
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
@@ -88,7 +89,8 @@ namespace StarterAssets
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
-        public bool isTag = false;
+        public bool _isTag = false;
+        private float _throwPower = 4f;
 
         // timeout deltatime
         private float _jumpTimeoutDelta;
@@ -131,9 +133,8 @@ namespace StarterAssets
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
-
+            СhangePlayerColor(gameObject.tag);
             AssignAnimationIDs();
-
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
@@ -150,6 +151,7 @@ namespace StarterAssets
                 Move();
                 Dance();
                 Beating();
+                Throwing();
             }
             Climbing();
         }
@@ -179,9 +181,18 @@ namespace StarterAssets
             {
                 if (_hasAnimator)
                 {
-
+                    _animator.SetTrigger("Throw");
                 }
             }
+        }
+
+        private void ThrowObject()
+        {
+            var invetoryObjectRb = inventoryObject.GetComponent<Rigidbody>();
+            invetoryObjectRb.transform.parent = null;
+            invetoryObjectRb.isKinematic = false;
+            invetoryObjectRb.AddForce(transform.forward*20, ForceMode.Impulse);
+            inventoryObject.GetComponent<Destruction>().isThrow = true;
         }
 
         private void LateUpdate()
@@ -456,11 +467,7 @@ namespace StarterAssets
                 {
                     if (gameObject.tag == "Player")
                     {
-                        foreach (var items in myObject.materials)
-                        {
-                            items.color = Color.red;
-                        }
-
+                        СhangePlayerColor(gameObject.tag);
                         gameObject.tag = "Tag";
                     }
                 }
@@ -469,10 +476,7 @@ namespace StarterAssets
                     {
                         if (gameObject.tag == "Tag")
                         {
-                            foreach (var items in myObject.materials)
-                            {
-                                items.color = Color.white;
-                            }
+                            СhangePlayerColor(gameObject.tag);
                             gameObject.tag = "Player";
                         }
                     }
@@ -504,5 +508,25 @@ namespace StarterAssets
                 _controller.Move(Vector3.down.normalized * (ClimbingSpeed * Time.deltaTime));
             }
         }
+
+        private void СhangePlayerColor(string tag)
+        {
+            if (tag == "Player")
+            {
+                foreach (var items in myObject.materials)
+                {
+                    items.color = Color.white;
+                }
+            }
+
+            if (tag == "Tag")
+            {
+                foreach (var items in myObject.materials)
+                {
+                    items.color = Color.red;
+                }
+            }
+        }
+
     }
 }

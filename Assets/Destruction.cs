@@ -5,9 +5,11 @@ using UnityEngine;
 public class Destruction : MonoBehaviour
 {
     public float delay = 3f;
+    public bool isThrow;
 
     private float countdown;
     private bool hasExploaded = false;
+    
     public GameObject explosionEffect;
 
     void Start()
@@ -18,18 +20,21 @@ public class Destruction : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        countdown -= Time.deltaTime;
-        if (countdown <= 0f && hasExploaded == false)
+        if (isThrow)
         {
-            Explode();
-            hasExploaded = true;
+            countdown -= Time.deltaTime;
+            if (countdown <= 0f && hasExploaded == false)
+            {
+                Explode();
+                hasExploaded = true;
+            }
         }
 
     }
 
     private void Explode()
     {
-        Instantiate(explosionEffect, transform.position, transform.rotation);
+        Instantiate(explosionEffect, transform.position,Quaternion.identity);
 
         Destroy(gameObject);
     }
