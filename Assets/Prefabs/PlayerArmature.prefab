@@ -1117,7 +1117,7 @@ MonoBehaviour:
   ClimbingSpeed: 0.5
   RotationSmoothTime: 0.12
   SpeedChangeRate: 10
-  myObject: {fileID: 0}
+  myObject: {fileID: 5597113867290821413}
   unTagMaterial: {fileID: 0}
   JumpHeight: 1.2
   Gravity: -15
