@@ -98,7 +98,7 @@ namespace StarterAssets
         private int _animIDClimbingDown;
 
 
-        private Animator _animator;
+		private Animator _animator;
 		private CharacterController _controller;
 		private StarterAssetsInputs _input;
 		private GameObject _mainCamera;
@@ -133,10 +133,10 @@ namespace StarterAssets
 		{
 			_hasAnimator = TryGetComponent(out _animator);
 
+            GroundedCheck();
             if (!_climbing)
             {
                 JumpAndGravity();
-                GroundedCheck();
                 Move();
                 Dance();
                 Beating();
@@ -190,24 +190,24 @@ namespace StarterAssets
             _animIDDanceID = Animator.StringToHash("DanceID");
 			_animIDClimbingUp = Animator.StringToHash("ClimbingUp");
 			_animIDClimbingDown = Animator.StringToHash("ClimbingDown");
-		}
+        }
 
 		private void GroundedCheck()
 		{
 			// set sphere position, with offset
 			Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
 			Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-
-			// update animator if using character
-			if (_hasAnimator)
+			
+            // update animator if using character
+            if (_hasAnimator)
 			{
 				_animator.SetBool(_animIDGrounded, Grounded);
                 _animator.SetBool(_animIDClimbingUp, false);
                 _animator.SetBool(_animIDClimbingDown, false);
-			}
-		}
+            }
+        }
 
-		private void CameraRotation()
+        private void CameraRotation()
 		{
 			// if there is an input and camera position is not fixed
 			if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
@@ -421,7 +421,9 @@ namespace StarterAssets
             {
                 _climbingZone = true;
                 _climbing = true;
-			}
+                var extents = col.bounds.extents; 
+                //_controller.transform.rotation = Quaternion.LookRotation(col.transform.position);
+            }
 		}
 
         void OnTriggerExit(Collider col)
@@ -430,7 +432,7 @@ namespace StarterAssets
             {
                 _climbingZone = false;
                 _climbing = false;
-            }
+			}
 		}
 
         void OnControllerColliderHit(ControllerColliderHit hit)
@@ -450,8 +452,8 @@ namespace StarterAssets
 		private void Climbing()
         {
             if (!_climbingZone) return;
-
-            var vectorClimbing = _input.move.x;
+            _animator.SetBool(_animIDGrounded, false);
+			var vectorClimbing = _input.move.y;
 
 			if (vectorClimbing > 0)
             {
@@ -459,6 +461,7 @@ namespace StarterAssets
 				_animator.SetBool(_animIDClimbingUp, true);
                 _animator.SetBool(_animIDClimbingDown, false);
                 _controller.Move(Vector3.up.normalized * (ClimbingSpeed * Time.deltaTime));
+
             }
             else if (vectorClimbing < 0)
             {
