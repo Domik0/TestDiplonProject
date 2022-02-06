@@ -1,20 +1,12 @@
 ﻿using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+using Unity.Netcode;
 using UnityEngine.InputSystem;
-#endif
-
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
-
 namespace StarterAssets
 {
-    [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-    [RequireComponent(typeof(PlayerInput))]
-#endif
-    public class ThirdPersonController : MonoBehaviour
+
+    public class ThirdPersonController : NetworkBehaviour
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -29,12 +21,7 @@ namespace StarterAssets
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
 
-        //public List<Material> tagMaterials;
-
         public Renderer myObject;
-
-        public Material unTagMaterial;
-
 
         [Space(10)]
         [Tooltip("The height the player can jump")]
@@ -89,7 +76,6 @@ namespace StarterAssets
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
-        public bool _isTag = false;
         private float _throwPower = 4f;
 
         // timeout deltatime
@@ -121,39 +107,52 @@ namespace StarterAssets
 
         private void Awake()
         {
-            // get a reference to our main camera
-            if (_mainCamera == null)
+            
+            if (IsClient)
             {
-                _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                if (_mainCamera == null)
+                {
+                    _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
+                }
             }
         }
 
         private void Start()
         {
-            _hasAnimator = TryGetComponent(out _animator);
-            _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
-            СhangePlayerColor(gameObject.tag);
-            AssignAnimationIDs();
-            // reset our timeouts on start
-            _jumpTimeoutDelta = JumpTimeout;
-            _fallTimeoutDelta = FallTimeout;
+            if (IsClient)
+            {
+                
+                _hasAnimator = TryGetComponent(out _animator);
+                _controller = GetComponent<CharacterController>();
+                _input = GetComponent<StarterAssetsInputs>(); 
+                СhangePlayerColor(gameObject.tag);
+                AssignAnimationIDs();
+                _jumpTimeoutDelta = JumpTimeout;
+                _fallTimeoutDelta = FallTimeout;
+                PlayerCameraFolow.Instance.FollowPlayer(CinemachineCameraTarget.transform);
+            }
         }
 
         private void Update()
         {
-            _hasAnimator = TryGetComponent(out _animator);
-
-            if (!_climbing)
+            if (gameObject == null)
             {
-                JumpAndGravity();
-                GroundedCheck();
-                Move();
-                Dance();
-                Beating();
-                Throwing();
+                Debug.Log("Не существует");
             }
-            Climbing();
+            if (IsClient)
+            {
+                _hasAnimator = TryGetComponent(out _animator);
+                if (!_climbing)
+                {
+                    JumpAndGravity();
+                    GroundedCheck();
+                    Move();
+                    Dance();
+                    Beating();
+                    Throwing();
+                }
+                Climbing();
+            }
         }
 
         private void Beating()
@@ -197,7 +196,10 @@ namespace StarterAssets
 
         private void LateUpdate()
         {
-            CameraRotation();
+            if (IsClient && IsOwner)
+            {
+                CameraRotation();
+            }
         }
 
         private void AssignAnimationIDs()

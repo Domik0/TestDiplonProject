@@ -1,3 +1,5 @@
+using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace StarterAssets
@@ -36,6 +38,15 @@ namespace StarterAssets
         public void VirtualThrow(bool virtualThrowState)
         {
             starterAssetsInputs.ThrowObjectInput(virtualThrowState);
+        }
+
+        private void Start()
+        {
+            if (NetworkManager.Singleton.IsClient)
+            {
+                starterAssetsInputs =
+                    NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<StarterAssetsInputs>();
+            }
         }
     }
 
