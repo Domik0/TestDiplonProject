@@ -178,33 +178,10 @@ namespace StarterAssets
                 callback(false, 0, false, null, null);
                 return;
             }
-            Vector3 spawnPos = Vector3.zero;
-            Quaternion spawnRot = Quaternion.identity;
-
-            switch (NetworkManager.Singleton.ConnectedClients.Count)
-            {
-                case 0:
-                    spawnPos = new Vector3(0f,0f, 0f);
-                    spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                    break;
-                case 1:
-                    spawnPos = new Vector3(2f, 0f, 0f);
-                    spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                    break;
-                case 2:
-                    spawnPos = new Vector3(4f, 0f, 0f);
-                    spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                    break;
-                case 3:
-                    spawnPos = new Vector3(6f, 0f, 0f);
-                    spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                    break;
-            }
-
 
             if (clientId == NetworkManager.Singleton.LocalClientId)
             {
-                callback(false, null, true, spawnPos, spawnRot);
+                callback(false, null, true, null, null);
                 return;
             }
 
@@ -212,7 +189,6 @@ namespace StarterAssets
             var connectionPayload = JsonUtility.FromJson<ConnectionPayload>(payload);
 
             ConnectStatus gameReturnStatus = ConnectStatus.Success;
-
 
             if (gameInProgress)
             {
@@ -230,13 +206,14 @@ namespace StarterAssets
                 clientData[connectionPayload.clientGUID] = new PlayerData(connectionPayload.playerName, clientId);
             }
 
-            callback(true, null, true, spawnPos, spawnRot);
-
-
-
-            //callback(false, 0, true, null, null);
+            callback(false, 0, true, null, null);
 
             gameNetPortal.ServerToClientConnectResult(clientId, gameReturnStatus);
+
+            if (gameReturnStatus != ConnectStatus.Success)
+            {
+                StartCoroutine(WaitToDisconnectClient(clientId, gameReturnStatus));
+            }
 
             if (gameReturnStatus != ConnectStatus.Success)
             {

@@ -1,14 +1,17 @@
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
+using Assets.Scripts;
 
 namespace StarterAssets
 {
-    public class UICanvasControllerInput : MonoBehaviour
+    public class UICanvasControllerInput : Assets.Scripts.Singleton<UICanvasControllerInput>
     {
+        
 
         [Header("Output")]
-        public StarterAssetsInputs starterAssetsInputs;
+
+        [SerializeField] StarterAssetsInputs starterAssetsInputs;
 
         public void VirtualMoveInput(Vector2 virtualMoveDirection)
         {
@@ -40,14 +43,11 @@ namespace StarterAssets
             starterAssetsInputs.ThrowObjectInput(virtualThrowState);
         }
 
-        private void Start()
+        public void FollowPlayer(StarterAssetsInputs input)
         {
-            if (NetworkManager.Singleton.IsClient)
-            {
-                starterAssetsInputs =
-                    NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<StarterAssetsInputs>();
-            }
+            starterAssetsInputs = input;
         }
+       
     }
 
 }
