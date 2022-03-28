@@ -7,8 +7,6 @@ namespace StarterAssets
 {
     public class UICanvasControllerInput : Assets.Scripts.Singleton<UICanvasControllerInput>
     {
-        
-
         [Header("Output")]
 
         [SerializeField] StarterAssetsInputs starterAssetsInputs;
@@ -47,8 +45,6 @@ namespace StarterAssets
         {
             starterAssetsInputs = input;
         }
-       
     }
-
 }
 
