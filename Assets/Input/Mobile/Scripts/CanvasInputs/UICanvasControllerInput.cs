@@ -43,6 +43,13 @@ namespace StarterAssets
             starterAssetsInputs.ThrowObjectInput(virtualThrowState);
         }
 
+
+        public void VirtualExit()
+        {
+            starterAssetsInputs.ExitGame();
+        }
+
+
         public void FollowPlayer(StarterAssetsInputs input)
         {
             starterAssetsInputs = input;
