@@ -1,20 +1,12 @@
 ﻿using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
+using Unity.Netcode;
 using UnityEngine.InputSystem;
-#endif
-
-/* Note: animations are called via the controller for both the character and capsule using animator null checks
- */
-
 namespace StarterAssets
 {
-    [RequireComponent(typeof(CharacterController))]
-#if ENABLE_INPUT_SYSTEM && STARTER_ASSETS_PACKAGES_CHECKED
-    [RequireComponent(typeof(PlayerInput))]
-#endif
-    public class ThirdPersonController : MonoBehaviour
+
+    public class ThirdPersonController : NetworkBehaviour
     {
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
@@ -29,12 +21,7 @@ namespace StarterAssets
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
 
-        //public List<Material> tagMaterials;
-
         public Renderer myObject;
-
-        public Material unTagMaterial;
-
 
         [Space(10)]
         [Tooltip("The height the player can jump")]
@@ -76,6 +63,11 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
+        [Header("Network")]
+
+        [SerializeField]
+        private NetworkVariable<Vector3> networkMotion = new NetworkVariable<Vector3>();
+
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -89,7 +81,6 @@ namespace StarterAssets
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
-        public bool _isTag = false;
         private float _throwPower = 4f;
 
         // timeout deltatime
@@ -109,6 +100,8 @@ namespace StarterAssets
         private int _animIDClimbingUp;
         private int _animIDClimbingDown;
 
+        
+        private Vector3 oldMotion = Vector3.zero;
 
         private Animator _animator;
         private CharacterController _controller;
@@ -121,39 +114,51 @@ namespace StarterAssets
 
         private void Awake()
         {
-            // get a reference to our main camera
             if (_mainCamera == null)
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
+
         }
 
         private void Start()
         {
-            _hasAnimator = TryGetComponent(out _animator);
-            _controller = GetComponent<CharacterController>();
-            _input = GetComponent<StarterAssetsInputs>();
-            СhangePlayerColor(gameObject.tag);
-            AssignAnimationIDs();
-            // reset our timeouts on start
-            _jumpTimeoutDelta = JumpTimeout;
-            _fallTimeoutDelta = FallTimeout;
+            if (IsClient && IsOwner)
+            {
+                PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
+                _hasAnimator = TryGetComponent(out _animator);
+                _controller = GetComponent<CharacterController>();
+                _input = GetComponent<StarterAssetsInputs>();
+                UICanvasControllerInput.Instance.FollowPlayer(_input);
+                СhangePlayerColor(gameObject.tag);
+                AssignAnimationIDs();
+                _jumpTimeoutDelta = JumpTimeout;
+                _fallTimeoutDelta = FallTimeout;
+                
+
+            }
         }
+
+       
 
         private void Update()
         {
-            _hasAnimator = TryGetComponent(out _animator);
-
-            if (!_climbing)
+            if (IsClient && IsOwner)
             {
+                _hasAnimator = TryGetComponent(out _animator);
+                //if (!_climbing)
+                //{
                 JumpAndGravity();
                 GroundedCheck();
-                Move();
+                ClientMove();
                 Dance();
                 Beating();
                 Throwing();
+                //}
+                //Climbing();
             }
-            Climbing();
+
+            ClientMoveAndRotate();
         }
 
         private void Beating()
@@ -197,7 +202,10 @@ namespace StarterAssets
 
         private void LateUpdate()
         {
-            CameraRotation();
+            if (IsClient && IsOwner)
+            {
+                CameraRotation();
+            }
         }
 
         private void AssignAnimationIDs()
@@ -245,7 +253,7 @@ namespace StarterAssets
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride, _cinemachineTargetYaw, 0.0f);
         }
 
-        private void Move()
+        private void ClientMove()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             float targetSpeed = CheckSprint() ? SprintSpeed : MoveSpeed;
@@ -295,8 +303,17 @@ namespace StarterAssets
 
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
+            var motion = targetDirection.normalized * (_speed * Time.deltaTime) +
+                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
+
             // move the player
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            _controller.Move(motion);
+
+            if (oldMotion != motion)
+            {
+                oldMotion = motion;
+                UpdateClientMotionServerRpc(motion);
+            }
 
             // update animator if using character
             if (_hasAnimator)
@@ -305,6 +322,23 @@ namespace StarterAssets
                 _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
             }
         }
+
+        [ServerRpc]
+        private void UpdateClientMotionServerRpc(Vector3 newMotion)
+        {
+            networkMotion.Value = newMotion;
+        }
+
+        private void ClientMoveAndRotate()
+        {
+            if (networkMotion.Value != Vector3.zero)
+            {
+                _controller.Move(networkMotion.Value);
+            }
+        }
+
+
+
 
         private bool CheckSprint()
         {

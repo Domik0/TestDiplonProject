@@ -44,5 +44,9 @@ namespace StarterAssets
         {
             throwObject = throwObjectState;
         }
+        public void ExitGame()
+        {
+            GameNetPortal.Instance.RequestDisconnect();
+        }
     }
 }
