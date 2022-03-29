@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
 using Assets.Scripts.Networking;
+using StarterAssets;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -30,6 +31,7 @@ public class TimeManager : NetworkSingleton<TimeManager>
                 if (currentTime.Value <= 0)
                 {
                     timerActive = false;
+                    GameNetPortal.Instance.RequestDisconnect();
                 }
             }
         }
