@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts;
 using Unity.VisualScripting;
 using UnityEngine;
 using Unity.Netcode;
@@ -68,6 +69,8 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<Vector3> networkMotion = new NetworkVariable<Vector3>();
 
+        private List<GameObject> chestList = new List<GameObject>();
+
         // cinemachine
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
@@ -75,6 +78,7 @@ namespace StarterAssets
         // player
         private bool _climbing;
         private bool _climbingZone;
+        private bool _chestZone;
         private float _speed;
         private float _animationBlend;
         private float _targetRotation = 0.0f;
@@ -100,7 +104,7 @@ namespace StarterAssets
         private int _animIDClimbingUp;
         private int _animIDClimbingDown;
 
-        
+
         private Vector3 oldMotion = Vector3.zero;
 
         private Animator _animator;
@@ -118,7 +122,6 @@ namespace StarterAssets
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
-
         }
 
         private void Start()
@@ -134,12 +137,8 @@ namespace StarterAssets
                 AssignAnimationIDs();
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
-                
-
             }
         }
-
-       
 
         private void Update()
         {
@@ -337,9 +336,6 @@ namespace StarterAssets
             }
         }
 
-
-
-
         private bool CheckSprint()
         {
             var valueX = _input.move.x;
@@ -478,6 +474,10 @@ namespace StarterAssets
                 _climbing = true;
             }
 
+            if (col.gameObject.tag == "Chest")
+            {
+                col.GameObject().GetComponentInParent<ChestAnimation>().ChestOpen();
+            }
         }
 
         void OnTriggerExit(Collider col)
@@ -561,6 +561,5 @@ namespace StarterAssets
                 }
             }
         }
-
     }
 }
