@@ -94,7 +94,7 @@ namespace StarterAssets
         {
             gameInProgress = false;
 
-            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Menu", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Lobby", LoadSceneMode.Single);
         }
 
         private void HandleNetworkReadied()
@@ -105,7 +105,7 @@ namespace StarterAssets
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
             gameNetPortal.OnClientSceneChanged += HandleClientSceneChanged;
 
-            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Main", LoadSceneMode.Single);
+            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Lobby", LoadSceneMode.Single);
 
             if (NetworkManager.Singleton.IsHost)
             {
@@ -215,10 +215,6 @@ namespace StarterAssets
                 StartCoroutine(WaitToDisconnectClient(clientId, gameReturnStatus));
             }
 
-            if (gameReturnStatus != ConnectStatus.Success)
-            {
-                StartCoroutine(WaitToDisconnectClient(clientId, gameReturnStatus));
-            }
         }
 
         private IEnumerator WaitToDisconnectClient(ulong clientId, ConnectStatus reason)
