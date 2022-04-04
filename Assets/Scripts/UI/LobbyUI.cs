@@ -1,20 +1,39 @@
+using System.Linq;
+using System.Threading;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace StarterAssets
 {
+    /// <summary>
+    /// Класс отвечающий за работу Лобби
+    /// </summary>
+
     public class LobbyUI : NetworkBehaviour
     {
         [Header("References")]
         [SerializeField] private LobbyPlayerCard[] lobbyPlayerCards;
+        [SerializeField] private GameObject errorPanel;
         [SerializeField] private Button startGameButton;
-
+        [SerializeField] private NetworkVariable<bool> hostExists;
         private NetworkList<LobbyPlayerState> lobbyPlayers;
 
         private void Awake()
         {
             lobbyPlayers = new NetworkList<LobbyPlayerState>();
+        }
+
+        public void Update()
+        {
+            if (IsHost&&hostExists.Value&& lobbyPlayers.Count==1)
+            {
+                Debug.Log(lobbyPlayers.Count);
+               GameNetPortal.Instance.RequestDisconnect();
+            }
+
+            
+
         }
 
         public override void OnNetworkSpawn()
@@ -69,10 +88,16 @@ namespace StarterAssets
             return true;
         }
 
+
+
+        /// <summary>
+        /// Метод который срабатывает при подключения клиента
+        /// </summary>
+        /// <param name="clientId">Id клиента, который подключается</param>
+
         private void HandleClientConnected(ulong clientId)
         {
             var playerData = ServerGameNetPortal.Instance.GetPlayerData(clientId);
-
             if (!playerData.HasValue) { return; }
 
             lobbyPlayers.Add(new LobbyPlayerState(
@@ -82,8 +107,14 @@ namespace StarterAssets
             ));
         }
 
+
+        /// <summary>
+        /// Срабатывает при отключения клиента
+        /// </summary>
+        /// <param name="clientId"></param>
         private void HandleClientDisconnect(ulong clientId)
         {
+           
             for (int i = 0; i < lobbyPlayers.Count; i++)
             {
                 if (lobbyPlayers[i].ClientId == clientId)
@@ -92,8 +123,13 @@ namespace StarterAssets
                     break;
                 }
             }
+          
         }
 
+        /// <summary>
+        /// Команда для сменны готовности игрока
+        /// </summary>
+        /// <param name="serverRpcParams"></param>
         [ServerRpc(RequireOwnership = false)]
         private void ToggleReadyServerRpc(ServerRpcParams serverRpcParams = default)
         {
@@ -110,6 +146,27 @@ namespace StarterAssets
             }
         }
 
+
+        [ClientRpc]
+        private void DisconectCallbackClientRpc()
+        {
+            if (!IsHost)
+            {
+                GameNetPortal.Instance.RequestDisconnect();
+            }
+            hostExists.Value = true;
+            Debug.Log(hostExists.Value);
+        }
+
+        [ServerRpc]
+        private void DisconectAllClientServerRpc(ClientRpcParams clientRpcParams=default)
+        {
+            DisconectCallbackClientRpc();
+        }
+
+       
+
+
         [ServerRpc(RequireOwnership = false)]
         private void StartGameServerRpc(ServerRpcParams serverRpcParams = default)
         {
@@ -122,12 +179,24 @@ namespace StarterAssets
 
         public void OnLeaveClicked()
         {
-            GameNetPortal.Instance.RequestDisconnect();
+          
+            if (IsHost)
+            {
+                DisconectAllClientServerRpc();
+            }
+            else
+            {
+                GameNetPortal.Instance.RequestDisconnect();
+            }
+            
+
         }
 
         public void OnReadyClicked()
         {
+            Debug.Log("" + NetworkManager.ConnectedClientsList.Count);
             ToggleReadyServerRpc();
+        
         }
 
         public void OnStartGameClicked()
@@ -135,6 +204,11 @@ namespace StarterAssets
             StartGameServerRpc();
         }
 
+
+        /// <summary>
+        /// Метод обновляет состояние мест игроков
+        /// </summary>
+        /// <param name="lobbyState">Список мест</param>
         private void HandleLobbyPlayersStateChanged(NetworkListEvent<LobbyPlayerState> lobbyState)
         {
             for (int i = 0; i < lobbyPlayerCards.Length; i++)

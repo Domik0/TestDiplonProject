@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 namespace StarterAssets
 {
+
     public class LobbyPlayerCard : MonoBehaviour
     {
         [Header("Panels")]

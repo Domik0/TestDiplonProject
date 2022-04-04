@@ -1190,7 +1190,10 @@ MonoBehaviour:
   - {fileID: 7232319429763406366}
   - {fileID: 3993218056703778789}
   - {fileID: 5023222955114932830}
+  errorPanel: {fileID: 0}
   startGameButton: {fileID: 1619667364}
+  hostExists:
+    m_InternalValue: 0
 --- !u!1 &3066103830377414067
 GameObject:
   m_ObjectHideFlags: 0

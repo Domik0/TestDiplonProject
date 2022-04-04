@@ -22,16 +22,20 @@ namespace StarterAssets
         [SerializeField] 
         private TextMeshProUGUI textError;
 
+
         private void Start()
         {
             PlayerPrefs.GetString("PlayerName");
         }
+
         public void OnHostClicked()
         {
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                GameNetPortal.Instance.StartHost();
+               
+                    GameNetPortal.Instance.StartHost();
+                
             }
             
         }
@@ -41,7 +45,12 @@ namespace StarterAssets
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                ClientGameNetPortal.Instance.StartClient();
+                if (CheckHost())
+                {
+                    
+                    ClientGameNetPortal.Instance.StartClient();
+                }
+               
             }
         }
 
@@ -53,9 +62,20 @@ namespace StarterAssets
                 errorPanel.SetActive(true);
                 return false;
             }
-
             return true;
         }
+
+        private bool CheckHost()
+        {
+            if (NetworkManager.Singleton.ConnectedHostname==null)
+            {
+                textError.text = "Game is not started";
+                errorPanel.SetActive(true);
+                return false;
+            }
+            return true;
+        }
+
     }
 }
 

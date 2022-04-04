@@ -7,6 +7,10 @@ using UnityEngine;
 
 namespace Assets.Scripts
 {
+    /// <summary>
+    /// Создает синглтон
+    /// </summary>
+    /// <typeparam name="T">Тип, который должен быть синглтоном</typeparam>
     public class Singleton<T> : MonoBehaviour
         where T : Component
     {

@@ -135,6 +135,8 @@ namespace StarterAssets
             }
         }
 
+
+
         private void HandleClientSceneChanged(ulong clientId, int sceneIndex)
         {
             clientSceneMap[clientId] = sceneIndex;

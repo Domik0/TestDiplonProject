@@ -7,11 +7,11 @@ using UnityEngine;
 public class SpawnManager:NetworkBehaviour
 {
     [SerializeField] NetworkObject PlayerPrefab;
-
     private void Start()
     {
         SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     private void SpawnPlayerServerRpc(ulong localClientId)
