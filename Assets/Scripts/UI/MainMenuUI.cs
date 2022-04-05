@@ -47,10 +47,8 @@ namespace StarterAssets
             {
                 if (CheckHost())
                 {
-                    
                     ClientGameNetPortal.Instance.StartClient();
                 }
-               
             }
         }
 
@@ -67,12 +65,12 @@ namespace StarterAssets
 
         private bool CheckHost()
         {
-            if (NetworkManager.Singleton.ConnectedHostname==null)
-            {
-                textError.text = "Game is not started";
-                errorPanel.SetActive(true);
-                return false;
-            }
+            //if (NetworkManager.Singleton.ConnectedHostname==null)
+            //{
+            //    textError.text = "Game is not started";
+            //    errorPanel.SetActive(true);
+            //    return false;
+            //}
             return true;
         }
 
