@@ -24,8 +24,12 @@ namespace Assets.Scripts
             if (IsClient && IsOwner)
             {
                 _hasAnimator = TryGetComponent(out _animator);
-                AssignAnimationIDs();
             }
+        }
+
+        private void Awake()
+        {
+            _animator = GetComponent<Animator>();
         }
 
         private void Update()
@@ -34,12 +38,6 @@ namespace Assets.Scripts
             {
                 _hasAnimator = TryGetComponent(out _animator);
             }
-        }
-
-        private void AssignAnimationIDs()
-        {
-            _animIDChestOpen = Animator.StringToHash("ChestOpen");
-            _animIDChestClose = Animator.StringToHash("ChestClose");
         }
 
         public void ChestOpen()

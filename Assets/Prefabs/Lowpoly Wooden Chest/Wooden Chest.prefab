@@ -32,7 +32,7 @@ Transform:
   m_Children:
   - {fileID: 4302379191424374}
   m_Father: {fileID: 4922331647626204}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33609948592031766
 MeshFilter:
@@ -262,6 +262,7 @@ GameObject:
   - component: {fileID: 33477892634079384}
   - component: {fileID: 23044034382215672}
   - component: {fileID: 95964531805101434}
+  - component: {fileID: 5785160819198102596}
   m_Layer: 7
   m_Name: chest_wooden
   m_TagString: Untagged
@@ -281,6 +282,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8255253703387057130}
   - {fileID: 4612075213376068}
   - {fileID: 4495446002708878}
   m_Father: {fileID: 4090485074951322}
@@ -356,6 +358,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &5785160819198102596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1544191852190126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 047878a95d9479d4d8675aee0a2d1e86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1632052825836748
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +379,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4090485074951322}
-  - component: {fileID: 2207556834337311926}
+  - component: {fileID: 8690602228867113167}
   m_Layer: 7
   m_Name: Wooden Chest
   m_TagString: Untagged
@@ -387,11 +401,10 @@ Transform:
   m_Children:
   - {fileID: 4922331647626204}
   - {fileID: 7705855767883613393}
-  - {fileID: 8255253703387057130}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2207556834337311926
+--- !u!114 &8690602228867113167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -400,9 +413,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1632052825836748}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 047878a95d9479d4d8675aee0a2d1e86, type: 3}
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &1902644749702062
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,7 +452,7 @@ Transform:
   m_Children:
   - {fileID: 4581575582285718}
   m_Father: {fileID: 4922331647626204}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &33982448297768522
 MeshFilter:
@@ -511,13 +528,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6466943942828728122}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.532, z: 0}
-  m_LocalScale: {x: 1.921045, y: 1.0589, z: 1.6617751}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0.53200006}
+  m_LocalScale: {x: 1.921045, y: 1.0588998, z: 1.6617748}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4090485074951322}
-  m_RootOrder: 2
+  m_Father: {fileID: 4922331647626204}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &8914319561697612962
 BoxCollider:
