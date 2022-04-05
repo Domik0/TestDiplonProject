@@ -4,6 +4,9 @@ using Unity.Netcode;
 
 namespace StarterAssets
 {
+    /// <summary>
+    /// Структура состояния карточки лобби
+    /// </summary>
     public struct LobbyPlayerState : INetworkSerializable, IEquatable<LobbyPlayerState>
     {
         public ulong ClientId;
