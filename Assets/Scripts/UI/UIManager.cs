@@ -8,16 +8,20 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TimeManager : NetworkSingleton<TimeManager>
+public class UIManager : NetworkSingleton<UIManager>
 {
     private bool timerActive = true;
     private NetworkVariable<float> currentTime;
+    private NetworkVariable<float> startTime;
     public int startMinutes;
+    public int loadingMinutes;
     public TextMeshProUGUI currentTimeText;
+    public Canvas LoadindScene;
 
     void Start()
     {
-        currentTime.Value = startMinutes * 60;
+        currentTime.Value = startMinutes * 60 + loadingMinutes;
+        startTime.Value = 0;
     }
 
     void Update()
@@ -31,6 +35,11 @@ public class TimeManager : NetworkSingleton<TimeManager>
                 {
                     timerActive = false;
                 }
+
+                if (startTime.Value >= loadingMinutes)
+                {
+                    LoadindScene.gameObject.SetActive(false);
+                }
             }
         }
 
@@ -42,6 +51,7 @@ public class TimeManager : NetworkSingleton<TimeManager>
     void UpdateTimeGameServerRpc()
     {
         currentTime.Value -= Time.deltaTime;
+        startTime.Value += Time.deltaTime;
     }
 
     public void StartTimer()
