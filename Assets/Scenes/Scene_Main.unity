@@ -13648,7 +13648,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startMinutes: 4
-  loadingMinutes: 2
+  loadingMinutes: 5
   currentTimeText: {fileID: 101017972}
   LoadindScene: {fileID: 568977232}
 --- !u!4 &1016743992 stripped
@@ -25409,10 +25409,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1892833259}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44afa975119ed40479063981821b15d6, type: 3}
+  m_Script: {fileID: 11500000, guid: 021208519694a784e98ba0ead44db6cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cinemachineVirtualCamera: {fileID: 0}
 --- !u!1001 &1902414933
 PrefabInstance:
   m_ObjectHideFlags: 0
