@@ -31,9 +31,6 @@ namespace StarterAssets
                 Debug.Log(lobbyPlayers.Count);
                GameNetPortal.Instance.RequestDisconnect();
             }
-
-            
-
         }
 
         public override void OnNetworkSpawn()
@@ -194,7 +191,6 @@ namespace StarterAssets
 
         public void OnReadyClicked()
         {
-            Debug.Log("" + NetworkManager.ConnectedClientsList.Count);
             ToggleReadyServerRpc();
         
         }
