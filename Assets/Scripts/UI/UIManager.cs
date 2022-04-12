@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net.Mime;
 using Assets.Scripts.Networking;
+using StarterAssets;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class UIManager : NetworkSingleton<UIManager>
                 if (currentTime.Value <= 0)
                 {
                     timerActive = false;
+                    GameNetPortal.Instance.RequestDisconnect();
                 }
 
                 if (startTime.Value >= loadingMinutes)
