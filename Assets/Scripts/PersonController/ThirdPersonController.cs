@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
 using UnityEngine;
 using Unity.Netcode;
@@ -20,15 +21,12 @@ namespace StarterAssets
         public float RotationSmoothTime = 0.12f;
         [Tooltip("Acceleration and deceleration")]
         public float SpeedChangeRate = 10.0f;
-
         public Renderer myObject;
-
         [Space(10)]
         [Tooltip("The height the player can jump")]
         public float JumpHeight = 1.2f;
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
         public float Gravity = -15.0f;
-
         [Space(10)]
         [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
         public float JumpTimeout = 0.50f;
@@ -36,9 +34,7 @@ namespace StarterAssets
         public float FallTimeout = 0.15f;
         [Tooltip("Time required to perform the dance")]
         public float DanceTimeout = 0.30f;
-
         public float PunchTimeout = 0.1f;
-
         public GameObject inventoryObject;
 
         [Header("Player Grounded")]
@@ -50,7 +46,6 @@ namespace StarterAssets
         public float GroundedRadius = 0.28f;
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
-
         [Header("Cinemachine")]
         [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
         public GameObject CinemachineCameraTarget;
@@ -63,24 +58,51 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
 
-        [Header("Network")]
-
         [SerializeField]
-        private NetworkVariable<Vector3> networkMotion = new NetworkVariable<Vector3>();
+        private float minPucnhDistance = 1.0f;
+        [SerializeField]
+        private GameObject hand;
 
-        // cinemachine
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
+        [Header("Network")]
+        [SerializeField]
+        private NetworkVariable<float> networkAnimationBlend = new NetworkVariable<float>();
+        [SerializeField]
+        private NetworkVariable<int> networkDanceId = new NetworkVariable<int>();
+        [SerializeField]
+        private NetworkVariable<PlayerState> networkPlayerState = new NetworkVariable<PlayerState>();
+        [SerializeField]
+        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>();
+        [SerializeField]
+        private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
+        [SerializeField]
+        private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
+        [SerializeField]
+        private NetworkVariable<int> countHits = new NetworkVariable<int>();
+        [SerializeField]
+        private NetworkVariable<bool> isTag = new NetworkVariable<bool>();
+
+
+        // client caches positions
+        private PlayerState _oldPlayerState = PlayerState.Move;
+        private int _oldDanceId;
+        private float _oldAnimationBlend;
+        private bool _oldGround;
+        private bool _oldAnimJump;
+        private bool _oldAnimFall;
+        private bool _oldTag;
 
         // player
         private bool _climbing;
         private bool _climbingZone;
         private float _speed;
         private float _animationBlend;
+
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
         private float _verticalVelocity;
         private float _terminalVelocity = 53.0f;
+        private float _cinemachineTargetYaw;
+        private float _cinemachineTargetPitch;
         private float _throwPower = 4f;
 
         // timeout deltatime
@@ -100,17 +122,14 @@ namespace StarterAssets
         private int _animIDClimbingUp;
         private int _animIDClimbingDown;
 
-        
-        private Vector3 oldMotion = Vector3.zero;
 
         private Animator _animator;
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
-
         private const float _threshold = 0.01f;
-
         private bool _hasAnimator;
+
 
         private void Awake()
         {
@@ -118,38 +137,36 @@ namespace StarterAssets
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
-
+            _controller = GetComponent<CharacterController>();
+            _animator = GetComponent<Animator>();
+            _input = GetComponent<StarterAssetsInputs>();
         }
 
         private void Start()
         {
+
             if (IsClient && IsOwner)
             {
                 PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
+                _animator = GetComponent<Animator>();
                 _hasAnimator = TryGetComponent(out _animator);
-                _controller = GetComponent<CharacterController>();
-                _input = GetComponent<StarterAssetsInputs>();
                 UICanvasControllerInput.Instance.FollowPlayer(_input);
-                СhangePlayerColor(gameObject.tag);
+                //СhangePlayerColor(gameObject.tag);
                 AssignAnimationIDs();
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
-                
-
             }
-        }
 
-       
+        }
 
         private void Update()
         {
             if (IsClient && IsOwner)
             {
-                _hasAnimator = TryGetComponent(out _animator);
                 //if (!_climbing)
                 //{
-                JumpAndGravity();
                 GroundedCheck();
+                JumpAndGravity();
                 ClientMove();
                 Dance();
                 Beating();
@@ -158,46 +175,7 @@ namespace StarterAssets
                 //Climbing();
             }
 
-            ClientMoveAndRotate();
-        }
-
-        private void Beating()
-        {
-            if (_input.punch)
-            {
-                if (_hasAnimator && _punchTimeoutDelta <= 0.0f)
-                {
-                    _animator.SetTrigger("Punch");
-                    _punchTimeoutDelta = PunchTimeout;
-                }
-
-                if (_punchTimeoutDelta >= 0.0f)
-                {
-                    _punchTimeoutDelta -= Time.deltaTime;
-                }
-            }
-
-
-        }
-
-        private void Throwing()
-        {
-            if (_input.throwObject)
-            {
-                if (_hasAnimator)
-                {
-                    _animator.SetTrigger("Throw");
-                }
-            }
-        }
-
-        private void ThrowObject()
-        {
-            var invetoryObjectRb = inventoryObject.GetComponent<Rigidbody>();
-            invetoryObjectRb.transform.parent = null;
-            invetoryObjectRb.isKinematic = false;
-            invetoryObjectRb.AddForce(transform.forward*20, ForceMode.Impulse);
-            inventoryObject.GetComponent<Destruction>().isThrow = true;
+            ClientVisuals();
         }
 
         private void LateUpdate()
@@ -221,6 +199,44 @@ namespace StarterAssets
             _animIDClimbingDown = Animator.StringToHash("ClimbingDown");
         }
 
+        private void Beating()
+        {
+            if (_input.punch)
+            {
+                if (_hasAnimator && _punchTimeoutDelta <= 0.0f)
+                {
+                    UpdatePlayerStateServerRpc(PlayerState.Punch);
+                    CheckPunch(hand.transform, Vector3.down);
+                    _punchTimeoutDelta = PunchTimeout;
+                }
+
+                if (_punchTimeoutDelta >= 0.0f)
+                {
+                    _punchTimeoutDelta -= Time.deltaTime;
+                }
+            }
+        }
+
+        private void Throwing()
+        {
+            if (_input.throwObject)
+            {
+                if (_hasAnimator)
+                {
+                    _animator.SetTrigger("Throw");
+                }
+            }
+        }
+
+        private void ThrowObject()
+        {
+            var invetoryObjectRb = inventoryObject.GetComponent<Rigidbody>();
+            invetoryObjectRb.transform.parent = null;
+            invetoryObjectRb.isKinematic = false;
+            invetoryObjectRb.AddForce(transform.forward * 20, ForceMode.Impulse);
+            inventoryObject.GetComponent<Destruction>().isThrow = true;
+        }
+
         private void GroundedCheck()
         {
             // set sphere position, with offset
@@ -230,9 +246,7 @@ namespace StarterAssets
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetBool(_animIDGrounded, Grounded);
-                _animator.SetBool(_animIDClimbingUp, false);
-                _animator.SetBool(_animIDClimbingDown, false);
+                UpdateGroundServerRpc(Grounded);
             }
         }
 
@@ -244,7 +258,6 @@ namespace StarterAssets
                 _cinemachineTargetYaw += _input.look.x * Time.deltaTime;
                 _cinemachineTargetPitch += _input.look.y * Time.deltaTime;
             }
-
             // clamp our rotations so our values are limited 360 degrees
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
             _cinemachineTargetPitch = ClampAngle(_cinemachineTargetPitch, BottomClamp, TopClamp);
@@ -256,27 +269,22 @@ namespace StarterAssets
         private void ClientMove()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
-            float targetSpeed = CheckSprint() ? SprintSpeed : MoveSpeed;
-
+            bool isSprint = CheckSprint();
+            float targetSpeed = isSprint ? SprintSpeed : MoveSpeed;
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
             if (_input.move == Vector2.zero) targetSpeed = 0.0f;
-
             // a reference to the players current horizontal velocity
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-
             float speedOffset = 0.1f;
-            float inputMagnitude =/* _input.analogMovement ? _input.move.magnitude :*/ 1f;
-
+            float inputMagnitude = 1f;
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
             {
                 // creates curved result rather than a linear one giving a more organic speed change
                 // note T in Lerp is clamped, so we don't need to clamp our speed
                 _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-
                 // round speed to 3 decimal places
                 _speed = Mathf.Round(_speed * 1000f) / 1000f;
             }
@@ -284,6 +292,7 @@ namespace StarterAssets
             {
                 _speed = targetSpeed;
             }
+
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
             // normalise input direction
@@ -300,43 +309,137 @@ namespace StarterAssets
                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
             }
 
-
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
-            var motion = targetDirection.normalized * (_speed * Time.deltaTime) +
-                         new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
-
             // move the player
-            _controller.Move(motion);
-
-            if (oldMotion != motion)
-            {
-                oldMotion = motion;
-                UpdateClientMotionServerRpc(motion);
-            }
+            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             // update animator if using character
             if (_hasAnimator)
             {
-                _animator.SetFloat(_animIDSpeed, _animationBlend);
-                _animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+                UpdatePlayerStateServerRpc(PlayerState.Move);
+                UpdateAnimationBlendServerRpc(_animationBlend);
+
             }
+        }
+
+
+        private void ClientVisuals()
+        {
+
+            if (_oldPlayerState != networkPlayerState.Value)
+            {
+                _oldPlayerState = networkPlayerState.Value;
+            }
+            if (networkPlayerState.Value == PlayerState.Dance)
+            {
+
+                if (_oldDanceId != networkDanceId.Value)
+                {
+                    _oldDanceId = networkDanceId.Value;
+                    _animator.SetFloat("DanceID", networkDanceId.Value);
+                    _animator.SetTrigger("Dance");
+                }
+            }
+
+            if (networkPlayerState.Value == PlayerState.Move)
+            {
+                if (_oldAnimationBlend != networkAnimationBlend.Value)
+                {
+                    _oldAnimationBlend = networkAnimationBlend.Value;
+                    _animator.SetFloat("Speed", networkAnimationBlend.Value);
+                }
+                if (_oldAnimFall != animFallNetwork.Value)
+                {
+                    _oldAnimFall = animFallNetwork.Value;
+                    _animator.SetBool("FreeFall", animFallNetwork.Value);
+                }
+
+                if (_oldAnimJump != animJumpNetwork.Value)
+                {
+                    _oldAnimJump = animJumpNetwork.Value;
+                    _animator.SetBool("Jump", animJumpNetwork.Value);
+                }
+
+                if (_oldGround != GroundNetwork.Value)
+                {
+                    _oldGround = GroundNetwork.Value;
+                    _animator.SetBool("Grounded", GroundNetwork.Value);
+                }
+            }
+
+            if (networkPlayerState.Value == PlayerState.Punch)
+            {
+                _animator.SetTrigger("Punch");
+
+            }
+
+            if (_oldTag != isTag.Value)
+            {
+                _oldTag = isTag.Value;
+                СhangePlayerColor(isTag.Value);
+            }
+        }
+
+
+
+        [ServerRpc]
+        private void UpdatePlayerStateServerRpc(PlayerState state)
+        {
+            networkPlayerState.Value = state;
+
         }
 
         [ServerRpc]
-        private void UpdateClientMotionServerRpc(Vector3 newMotion)
+        private void UpdateDanceIdServerRpc(int danceId)
         {
-            networkMotion.Value = newMotion;
+            networkDanceId.Value = danceId;
         }
 
-        private void ClientMoveAndRotate()
+        [ServerRpc]
+        private void UpdateAnimationBlendServerRpc(float blend)
         {
-            if (networkMotion.Value != Vector3.zero)
+            networkAnimationBlend.Value = blend;
+        }
+
+        [ServerRpc]
+        private void UpdateJumpServerRpc(bool isJump)
+        {
+            animJumpNetwork.Value = isJump;
+        }
+
+        [ServerRpc]
+        private void UpdateFallServerRpc(bool isFall)
+        {
+            animFallNetwork.Value = isFall;
+        }
+
+        [ServerRpc]
+        private void UpdateGroundServerRpc(bool isGround)
+        {
+            GroundNetwork.Value = isGround;
+        }
+
+        [ServerRpc]
+        private void UpdateTagServerRpc(bool takeAwayPoint, ulong clientId)
+        {
+            var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
+                .PlayerObject.GetComponent<ThirdPersonController>();
+
+            if (clientWithDamaged != null)
             {
-                _controller.Move(networkMotion.Value);
+                clientWithDamaged.isTag.Value = takeAwayPoint;
+                clientWithDamaged.countHits.Value += 1;
+                isTag.Value = !takeAwayPoint;
             }
+            NotifyHealthChangedClientRpc(takeAwayPoint, new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { clientId }
+                }
+            });
         }
-
 
 
 
@@ -351,9 +454,42 @@ namespace StarterAssets
             return false;
         }
 
+        private void CheckPunch(Transform hand, Vector3 aimDirection)
+        {
+            RaycastHit hit;
+
+            int layerMask = LayerMask.GetMask("Player");
+
+            if (Physics.Raycast(hand.position, hand.transform.TransformDirection(aimDirection), out hit, minPucnhDistance, layerMask))
+            {
+                Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.yellow);
+
+                var playerHit = hit.transform.GetComponent<NetworkObject>();
+                if (playerHit != null)
+                {
+
+                    UpdateTagServerRpc(true, playerHit.OwnerClientId);
+                }
+
+            }
+            else
+            {
+                Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.red);
+            }
+        }
+
+        [ClientRpc]
+        private void NotifyHealthChangedClientRpc(bool takeAwayPoint, ClientRpcParams clientRpcParams)
+        {
+            if (IsOwner) return;
+
+            Debug.Log($"Client got punch {takeAwayPoint}");
+        }
+
+
         private void JumpAndGravity()
         {
-            if (Grounded)
+            if (GroundNetwork.Value)
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -361,8 +497,10 @@ namespace StarterAssets
                 // update animator if using character
                 if (_hasAnimator)
                 {
-                    _animator.SetBool(_animIDJump, false);
-                    _animator.SetBool(_animIDFreeFall, false);
+                    UpdateJumpServerRpc(false);
+                    UpdateFallServerRpc(false);
+                    //_animator.SetBool(_animIDJump, false);
+                    //_animator.SetBool(_animIDFreeFall, false);
                 }
 
                 // stop our velocity dropping infinitely when grounded
@@ -380,7 +518,9 @@ namespace StarterAssets
                     // update animator if using character
                     if (_hasAnimator)
                     {
-                        _animator.SetBool(_animIDJump, true);
+                        //   UpdatePlayerStateServerRpc(PlayerState.Jump);
+                        UpdateJumpServerRpc(true);
+                        //_animator.SetBool(_animIDJump, true);
                     }
                 }
 
@@ -405,7 +545,8 @@ namespace StarterAssets
                     // update animator if using character
                     if (_hasAnimator)
                     {
-                        _animator.SetBool(_animIDFreeFall, true);
+                        UpdateFallServerRpc(true);
+                        //_animator.SetBool(_animIDFreeFall, true);
                     }
                 }
 
@@ -427,17 +568,6 @@ namespace StarterAssets
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
 
-        private void OnDrawGizmosSelected()
-        {
-            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-            if (Grounded) Gizmos.color = transparentGreen;
-            else Gizmos.color = transparentRed;
-
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
-        }
 
         private void Dance()
         {
@@ -449,8 +579,8 @@ namespace StarterAssets
                     {
                         _danceTimeoutDelta = DanceTimeout;
 
-                        _animator.SetFloat(_animIDDanceID, _input.dance);
-                        _animator.SetTrigger("Dance");
+                        UpdateDanceIdServerRpc(_input.dance);
+                        UpdatePlayerStateServerRpc(PlayerState.Dance);
                     }
 
                     if (_danceTimeoutDelta >= 0.0f)
@@ -470,24 +600,7 @@ namespace StarterAssets
             }
         }
 
-        void OnTriggerEnter(Collider col)
-        {
-            if (col.gameObject.tag == "Ladder")
-            {
-                _climbingZone = true;
-                _climbing = true;
-            }
 
-        }
-
-        void OnTriggerExit(Collider col)
-        {
-            if (col.gameObject.tag == "Ladder")
-            {
-                _climbingZone = false;
-                _climbing = false;
-            }
-        }
 
         void OnControllerColliderHit(ControllerColliderHit hit)
         {
@@ -497,55 +610,17 @@ namespace StarterAssets
                     JumpHeight = 2f;
                     _input.jump = true;
                     break;
-                case "Tag":
-                {
-                    if (gameObject.tag == "Player")
-                    {
-                        СhangePlayerColor(gameObject.tag);
-                        gameObject.tag = "Tag";
-                    }
-                }
-                    break;
-                case "Player":
-                    {
-                        if (gameObject.tag == "Tag")
-                        {
-                            СhangePlayerColor(gameObject.tag);
-                            gameObject.tag = "Player";
-                        }
-                    }
-                    break;
                 default:
                     JumpHeight = 1.2f;
                     break;
             }
         }
 
-        private void Climbing()
+
+
+        private void СhangePlayerColor(bool tag)
         {
-            if (!_climbingZone) return;
-
-            var vectorClimbing = _input.move.x;
-
-            if (vectorClimbing > 0)
-            {
-                _climbing = true;
-                _animator.SetBool(_animIDClimbingUp, true);
-                _animator.SetBool(_animIDClimbingDown, false);
-                _controller.Move(Vector3.up.normalized * (ClimbingSpeed * Time.deltaTime));
-            }
-            else if (vectorClimbing < 0)
-            {
-                _climbing = true;
-                _animator.SetBool(_animIDClimbingUp, false);
-                _animator.SetBool(_animIDClimbingDown, true);
-                _controller.Move(Vector3.down.normalized * (ClimbingSpeed * Time.deltaTime));
-            }
-        }
-
-        private void СhangePlayerColor(string tag)
-        {
-            if (tag == "Player")
+            if (!tag)
             {
                 foreach (var items in myObject.materials)
                 {
@@ -553,7 +628,7 @@ namespace StarterAssets
                 }
             }
 
-            if (tag == "Tag")
+            if (tag)
             {
                 foreach (var items in myObject.materials)
                 {
@@ -563,4 +638,6 @@ namespace StarterAssets
         }
 
     }
+
+    
 }
