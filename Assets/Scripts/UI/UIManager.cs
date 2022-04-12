@@ -37,12 +37,12 @@ public class UIManager : NetworkSingleton<UIManager>
                     timerActive = false;
                     GameNetPortal.Instance.RequestDisconnect();
                 }
-
-                if (startTime.Value >= loadingMinutes)
-                {
-                    LoadindScene.gameObject.SetActive(false);
-                }
             }
+        }
+
+        if (startTime.Value >= loadingMinutes)
+        {
+            LoadindScene.gameObject.SetActive(false);
         }
 
         TimeSpan time = TimeSpan.FromSeconds(currentTime.Value);
