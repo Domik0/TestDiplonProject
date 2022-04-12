@@ -45,7 +45,12 @@ namespace StarterAssets
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                ClientGameNetPortal.Instance.StartClient();
+                if (CheckHost())
+                {
+                    
+                    ClientGameNetPortal.Instance.StartClient();
+                }
+               
             }
         }
 
@@ -59,6 +64,18 @@ namespace StarterAssets
             }
             return true;
         }
+
+        private bool CheckHost()
+        {
+            if (NetworkManager.Singleton.ConnectedHostname==null)
+            {
+                textError.text = "Game is not started";
+                errorPanel.SetActive(true);
+                return false;
+            }
+            return true;
+        }
+
     }
 }
 

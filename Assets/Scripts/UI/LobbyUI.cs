@@ -194,7 +194,9 @@ namespace StarterAssets
 
         public void OnReadyClicked()
         {
+            Debug.Log("" + NetworkManager.ConnectedClientsList.Count);
             ToggleReadyServerRpc();
+        
         }
 
         public void OnStartGameClicked()
