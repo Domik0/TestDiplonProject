@@ -12,8 +12,8 @@ using UnityEngine.UI;
 public class UIManager : NetworkSingleton<UIManager>
 {
     private bool timerActive = true;
-    private NetworkVariable<float> currentTime;
-    private NetworkVariable<float> startTime;
+    private NetworkVariable<float> currentTime=new NetworkVariable<float>();
+    private NetworkVariable<float> startTime= new NetworkVariable<float>();
     public int startMinutes;
     public int loadingMinutes;
     public TextMeshProUGUI currentTimeText;
@@ -21,8 +21,12 @@ public class UIManager : NetworkSingleton<UIManager>
 
     void Start()
     {
-        currentTime.Value = startMinutes * 60 + loadingMinutes;
-        startTime.Value = 0;
+        if (IsServer)
+        {
+            UpdateCurentTimeServerRpc();
+        }
+        
+        
     }
 
     void Update()
@@ -55,6 +59,14 @@ public class UIManager : NetworkSingleton<UIManager>
         currentTime.Value -= Time.deltaTime;
         startTime.Value += Time.deltaTime;
     }
+
+    [ServerRpc]
+    void UpdateCurentTimeServerRpc()
+    {
+        currentTime.Value = startMinutes * 60 + loadingMinutes;
+        startTime.Value = 0;
+    }
+
 
     public void StartTimer()
     {

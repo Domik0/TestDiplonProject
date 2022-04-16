@@ -71,7 +71,7 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<PlayerState> networkPlayerState = new NetworkVariable<PlayerState>();
         [SerializeField]
-        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>();
+        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>(true);
         [SerializeField]
         private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
         [SerializeField]

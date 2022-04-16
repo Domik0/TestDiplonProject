@@ -10,11 +10,6 @@ public class PlayerFollow : Singleton<PlayerFollow>
     [SerializeField]
     private CinemachineVirtualCamera cinemachineVirtualCamera;
 
-    private void Awake()
-    {
-        cinemachineVirtualCamera = GetComponent<CinemachineVirtualCamera>();
-    }
-
     /// <summary>
     /// Метод для слежение за объектом
     /// </summary>
