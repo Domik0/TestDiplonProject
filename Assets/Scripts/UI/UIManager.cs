@@ -17,7 +17,8 @@ public class UIManager : NetworkSingleton<UIManager>
     public int startMinutes;
     public int loadingMinutes;
     public TextMeshProUGUI currentTimeText;
-    public Canvas LoadindScene;
+    public GameObject LoadindScene;
+    public GameObject Buttons;
 
     void Start()
     {
@@ -46,7 +47,8 @@ public class UIManager : NetworkSingleton<UIManager>
 
         if (startTime.Value >= loadingMinutes)
         {
-            LoadindScene.gameObject.SetActive(false);
+            LoadindScene.SetActive(false);
+            Buttons.SetActive(true);
         }
 
         TimeSpan time = TimeSpan.FromSeconds(currentTime.Value);

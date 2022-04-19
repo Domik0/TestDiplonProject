@@ -1039,7 +1039,6 @@ GameObject:
   - component: {fileID: 4416926081852918493}
   - component: {fileID: 5287089691064055494}
   - component: {fileID: 4230983722378465739}
-  - component: {fileID: 7527853159145260247}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1128,12 +1127,12 @@ MonoBehaviour:
   DanceTimeout: 0.3
   PunchTimeout: 0.1
   inventoryObject: {fileID: 0}
-  Grounded: 1
+  Grounded: 0
   GroundedOffset: -0.14
   GroundedRadius: 0.28
   GroundLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   CinemachineCameraTarget: {fileID: 8338988566280778634}
   TopClamp: 70
   BottomClamp: -30
@@ -1171,8 +1170,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushLayers:
     serializedVersion: 2
-    m_Bits: 0
-  canPush: 0
+    m_Bits: 64
+  canPush: 1
   strength: 1.1
 --- !u!114 &135756642000475821
 MonoBehaviour:
@@ -1256,27 +1255,14 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &7527853159145260247
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416926081852918481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Animator: {fileID: 6982812146204527121}
 --- !u!1 &4523139366846529165
 GameObject:
   m_ObjectHideFlags: 0

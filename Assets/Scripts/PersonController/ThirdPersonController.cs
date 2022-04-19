@@ -71,7 +71,7 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<PlayerState> networkPlayerState = new NetworkVariable<PlayerState>();
         [SerializeField]
-        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>(true);
+        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>();
         [SerializeField]
         private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
         [SerializeField]
@@ -241,13 +241,8 @@ namespace StarterAssets
         {
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-
-            // update animator if using character
-            if (_hasAnimator)
-            {
-                UpdateGroundServerRpc(Grounded);
-            }
+            bool grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+            UpdateGroundServerRpc(grounded);
         }
 
         private void CameraRotation()
@@ -293,7 +288,7 @@ namespace StarterAssets
                 _speed = targetSpeed;
             }
 
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
             // normalise input direction
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
