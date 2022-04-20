@@ -33,9 +33,7 @@ namespace StarterAssets
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-               
-                    GameNetPortal.Instance.StartHost();
-                
+                GameNetPortal.Instance.StartHost();
             }
             
         }
