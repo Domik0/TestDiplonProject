@@ -37,11 +37,9 @@ namespace Assets.Scripts.UI
 
         public void SetOverlay()
         {
-            var localPlayerOverlay = gameObject.GetComponentsInChildren<TextMeshProUGUI>();
-            foreach (var textBox in localPlayerOverlay)
-            {
-                textBox.text = playerNetworkName.Value;
-            }
+            var localPlayerOverlay = gameObject.GetComponentInChildren<TextMeshProUGUI>();
+            localPlayerOverlay.text = playerNetworkName.Value;
+            
         }
 
         public void Update()

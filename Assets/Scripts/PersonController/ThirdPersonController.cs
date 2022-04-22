@@ -79,7 +79,7 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<int> countHits = new NetworkVariable<int>();
         [SerializeField]
-        private NetworkVariable<bool> isTag = new NetworkVariable<bool>();
+        public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
 
 
         // client caches positions

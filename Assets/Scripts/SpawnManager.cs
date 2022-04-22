@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using StarterAssets;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -12,6 +13,12 @@ public class SpawnManager:NetworkBehaviour
 
     private List<int> listSpawnPlayer = new List<int>();
     private List<int> listSpawnChest = new List<int>();
+    private static NetworkVariable<bool> isTagSpawned=new NetworkVariable<bool>();
+
+    private void Awake()
+    {
+        Debug.Log(NetworkManager.ConnectedClients.Count);
+    }
 
     private void Start()
     {
@@ -51,6 +58,12 @@ public class SpawnManager:NetworkBehaviour
                 break;
         }
         var go = Instantiate(PlayerPrefab, spawnPos, spawnRot);
+        if (!isTagSpawned.Value)
+        {
+            var value = Convert.ToBoolean(Random.Range(0, 1));
+            isTagSpawned.Value = value;
+            go.GetComponent<ThirdPersonController>().isTag.Value = value;
+        }
         go.SpawnAsPlayerObject(localClientId);
     }
 
