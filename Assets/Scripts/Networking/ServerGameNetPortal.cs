@@ -16,7 +16,7 @@ namespace StarterAssets
         public static ServerGameNetPortal Instance => instance;
         private static ServerGameNetPortal instance;
 
-        private Dictionary<string, PlayerData> clientData;
+        public Dictionary<string, PlayerData> clientData;
         private Dictionary<ulong, string> clientIdToGuid;
         private Dictionary<ulong, int> clientSceneMap;
         private bool gameInProgress;

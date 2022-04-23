@@ -15,15 +15,28 @@ public class SpawnManager:NetworkBehaviour
     private List<int> listSpawnChest = new List<int>();
     private static NetworkVariable<bool> isTagSpawned=new NetworkVariable<bool>();
 
+    private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
+    private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
+
     private void Awake()
     {
-        Debug.Log(NetworkManager.ConnectedClients.Count);
     }
 
     private void Start()
     {
+        if (IsServer && rndTag.Value == 0)
+        {
+            rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
+        }
+        AddConnectPlayerServerRpc();
         SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
         SpawnBonusServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    private void AddConnectPlayerServerRpc()
+    {
+        loudingCount.Value++;
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -58,11 +71,9 @@ public class SpawnManager:NetworkBehaviour
                 break;
         }
         var go = Instantiate(PlayerPrefab, spawnPos, spawnRot);
-        if (!isTagSpawned.Value)
+        if (loudingCount.Value == rndTag.Value)
         {
-            var value = Convert.ToBoolean(Random.Range(0, 1));
-            isTagSpawned.Value = value;
-            go.GetComponent<ThirdPersonController>().isTag.Value = value;
+            go.GetComponent<ThirdPersonController>().isTag.Value = true;
         }
         go.SpawnAsPlayerObject(localClientId);
     }
