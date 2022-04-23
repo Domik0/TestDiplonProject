@@ -11,7 +11,7 @@ public class SpawnManager:NetworkBehaviour
     [SerializeField] NetworkObject PlayerPrefab;
     [SerializeField] NetworkObject ChestPrefab;
 
-    private List<int> listSpawnPlayer = new List<int>();
+    private NetworkList<int> listSpawnPlayer = new NetworkList<int>();
     private List<int> listSpawnChest = new List<int>();
     private static NetworkVariable<bool> isTagSpawned=new NetworkVariable<bool>();
 
@@ -44,12 +44,13 @@ public class SpawnManager:NetworkBehaviour
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
+        int rndSpawnPointId;
 
-        int rndSpawnPointId = Random.Range(1, 4);
-        while (listSpawnPlayer.Contains(rndSpawnPointId))
-        {
-            rndSpawnPointId = Random.Range(1, 4);
+        do {
+            rndSpawnPointId = Random.Range(0, 4);
         }
+        while(listSpawnPlayer.Contains(rndSpawnPointId));
+        listSpawnPlayer.Add(rndSpawnPointId);
 
         switch (rndSpawnPointId)
         {

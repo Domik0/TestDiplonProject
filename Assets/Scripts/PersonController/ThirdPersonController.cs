@@ -568,7 +568,7 @@ namespace StarterAssets
         {
             if (_input.dance > 0)
             {
-                if (Grounded)
+                if (GroundNetwork.Value)
                 {
                     if (_hasAnimator && _danceTimeoutDelta <= 0.0f)
                     {
