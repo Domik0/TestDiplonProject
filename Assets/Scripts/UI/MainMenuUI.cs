@@ -1,6 +1,7 @@
 using System;
 using TMPro;
 using Unity.Netcode;
+using Unity.Netcode.Transports.UNET;
 using UnityEngine;
 
 namespace StarterAssets
@@ -26,10 +27,17 @@ namespace StarterAssets
         [SerializeField] 
         private TextMeshProUGUI textError;
 
+        [SerializeField]
+        private GameObject goUNetTransport;
+
+        private UNetTransport uNetTransport;
+
 
         private void Start()
         {
+            uNetTransport = goUNetTransport.GetComponent<UNetTransport>();
             PlayerPrefs.GetString("PlayerName");
+            displayPortInputField.text = uNetTransport.ConnectPort.ToString();
         }
 
         public void OnHostClicked()
