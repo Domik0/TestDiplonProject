@@ -6,14 +6,14 @@ using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class SpawnManager:NetworkBehaviour
+public class SpawnManager : NetworkBehaviour
 {
     [SerializeField] NetworkObject PlayerPrefab;
     [SerializeField] NetworkObject ChestPrefab;
 
     private NetworkList<int> listSpawnPlayer = new NetworkList<int>();
     private List<int> listSpawnChest = new List<int>();
-    private static NetworkVariable<bool> isTagSpawned=new NetworkVariable<bool>();
+    private static NetworkVariable<bool> isTagSpawned = new NetworkVariable<bool>();
 
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
     private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
@@ -43,11 +43,11 @@ public class SpawnManager:NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerServerRpc(ulong localClientId,int rndSpawnPointId)
+    private void SpawnPlayerServerRpc(ulong localClientId, int rndSpawnPointId)
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
-      
+
         listSpawnPlayer.Add(rndSpawnPointId);
 
         switch (rndSpawnPointId)

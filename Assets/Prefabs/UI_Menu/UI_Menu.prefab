@@ -2017,8 +2017,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayNameInputField: {fileID: 7002103879040613755}
+  displayPortInputField: {fileID: 0}
   errorPanel: {fileID: 0}
   textError: {fileID: 0}
+  goUNetTransport: {fileID: 0}
 --- !u!1 &7600295320786799756
 GameObject:
   m_ObjectHideFlags: 0

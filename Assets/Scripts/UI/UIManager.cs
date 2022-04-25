@@ -7,15 +7,16 @@ using StarterAssets;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIManager : NetworkSingleton<UIManager>
 {
     private bool timerActive = true;
-    private NetworkVariable<float> currentTime=new NetworkVariable<float>();
-    private NetworkVariable<float> startTime= new NetworkVariable<float>();
+    private NetworkVariable<TimeSpan> currentTime = new NetworkVariable<TimeSpan>();
+    private NetworkVariable<TimeSpan> startTime = new NetworkVariable<TimeSpan>();
     public int startMinutes;
-    public int loadingMinutes;
+    public int loadingSeconds;
     public TextMeshProUGUI currentTimeText;
     public GameObject LoadindScene;
     public GameObject Buttons;
@@ -26,47 +27,45 @@ public class UIManager : NetworkSingleton<UIManager>
         {
             UpdateCurentTimeServerRpc();
         }
-        
-        
     }
 
     void Update()
     {
-        if(IsServer)
+        if (IsServer)
         {
             if (timerActive)
             {
                 UpdateTimeGameServerRpc();
-                if (currentTime.Value <= 0)
+                if (currentTime.Value <= TimeSpan.Zero)
                 {
                     timerActive = false;
-                    GameNetPortal.Instance.RequestDisconnect();
+                    //GameNetPortal.Instance.RequestDisconnect();
+                    NetworkManager.Singleton.SceneManager.LoadScene("Scene_EndGame", LoadSceneMode.Single);
                 }
             }
         }
 
-        if (startTime.Value >= loadingMinutes)
+        if (startTime.Value >= TimeSpan.FromSeconds(loadingSeconds))
         {
             LoadindScene.SetActive(false);
             Buttons.SetActive(true);
         }
-
-        TimeSpan time = TimeSpan.FromSeconds(currentTime.Value);
-        currentTimeText.text = time.Minutes.ToString() + ":" + time.Seconds.ToString();
+        
+        currentTimeText.text = currentTime.Value.ToString(@"mm\:ss");
     }
 
     [ServerRpc]
     void UpdateTimeGameServerRpc()
     {
-        currentTime.Value -= Time.deltaTime;
-        startTime.Value += Time.deltaTime;
+        currentTime.Value -= TimeSpan.FromSeconds(Time.deltaTime);
+        startTime.Value += TimeSpan.FromSeconds(Time.deltaTime);
     }
 
     [ServerRpc]
     void UpdateCurentTimeServerRpc()
     {
-        currentTime.Value = startMinutes * 60 + loadingMinutes;
-        startTime.Value = 0;
+        currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60 + loadingSeconds);
+        startTime.Value = TimeSpan.Zero;
     }
 
 

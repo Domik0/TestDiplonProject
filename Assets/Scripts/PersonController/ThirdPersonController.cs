@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -77,7 +78,7 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
         [SerializeField]
-        private NetworkVariable<int> countHits = new NetworkVariable<int>();
+        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
         [SerializeField]
         public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
 
@@ -165,17 +166,26 @@ namespace StarterAssets
             {
                 //if (!_climbing)
                 //{
+                //}
+                //Climbing();
                 GroundedCheck();
                 JumpAndGravity();
                 ClientMove();
                 Dance();
                 Beating();
                 Throwing();
-                //}
-                //Climbing();
+                TimeTagChange();
             }
 
             ClientVisuals();
+        }
+
+        private void TimeTagChange()
+        {
+            if (isTag.Value)
+            {
+                timeTag.Value += TimeSpan.FromSeconds(Time.deltaTime);
+            }
         }
 
         private void LateUpdate()
@@ -457,9 +467,6 @@ namespace StarterAssets
             if (Physics.Raycast(hand.position, hand.transform.TransformDirection(aimDirection), out hit, minPucnhDistance, layerMask))
             {
                 Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.yellow);
-
-               
-
             }
             else
             {
@@ -622,18 +629,6 @@ namespace StarterAssets
             }
         }
 
-
-
-        [ServerRpc]
-        private void AddCountHitServerRpc()
-        {
-            countHits.Value += 1;
-        }
-
-
-
-
-
         private void СhangePlayerColor(bool tag)
         {
             if (!tag)
@@ -650,16 +645,7 @@ namespace StarterAssets
                 {
                     items.color = Color.red;
                 }
-
-                if (IsClient && IsOwner)
-                {
-                    AddCountHitServerRpc();
-                }
-               
             }
         }
-
     }
-
-    
 }
