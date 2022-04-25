@@ -9,6 +9,8 @@ TagManager:
   - Trampoline
   - Tag
   - Decoration
+  - Chest
+  - VirtualCamera
   layers:
   - Default
   - TransparentFX

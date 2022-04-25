@@ -206,7 +206,7 @@ namespace StarterAssets
                 if (_hasAnimator && _punchTimeoutDelta <= 0.0f)
                 {
                     UpdatePlayerStateServerRpc(PlayerState.Punch);
-                    CheckPunch(hand.transform, Vector3.down);
+                    //CheckPunch(hand.transform, Vector3.down);
                     _punchTimeoutDelta = PunchTimeout;
                 }
 
@@ -416,18 +416,17 @@ namespace StarterAssets
         }
 
         [ServerRpc]
-        private void UpdateTagServerRpc(bool takeAwayPoint, ulong clientId)
+        private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
         {
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<ThirdPersonController>();
 
             if (clientWithDamaged != null)
             {
-                clientWithDamaged.isTag.Value = takeAwayPoint;
-                clientWithDamaged.countHits.Value += 1;
-                isTag.Value = !takeAwayPoint;
+                clientWithDamaged.isTag.Value = tagStatus;
+                isTag.Value = !tagStatus;
             }
-            NotifyHealthChangedClientRpc(takeAwayPoint, new ClientRpcParams
+            NotifyHealthChangedClientRpc(tagStatus, new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
@@ -459,12 +458,7 @@ namespace StarterAssets
             {
                 Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.yellow);
 
-                var playerHit = hit.transform.GetComponent<NetworkObject>();
-                if (playerHit != null)
-                {
-
-                    UpdateTagServerRpc(true, playerHit.OwnerClientId);
-                }
+               
 
             }
             else
@@ -601,6 +595,23 @@ namespace StarterAssets
         {
             switch (hit.gameObject.tag)
             {
+                case "Player":
+                {
+                    var playerHit = hit.transform.GetComponent<NetworkObject>();
+                    if (playerHit != null)
+                    {
+                        if (isTag.Value)
+                        {
+                            UpdateTagServerRpc(true, playerHit.OwnerClientId);
+                        }
+
+                        if (!isTag.Value)
+                        {
+                            UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                        }
+                    }
+                }
+                    break;
                 case "Trampoline":
                     JumpHeight = 2f;
                     _input.jump = true;
@@ -610,6 +621,16 @@ namespace StarterAssets
                     break;
             }
         }
+
+
+
+        [ServerRpc]
+        private void AddCountHitServerRpc()
+        {
+            countHits.Value += 1;
+        }
+
+
 
 
 
@@ -629,6 +650,12 @@ namespace StarterAssets
                 {
                     items.color = Color.red;
                 }
+
+                if (IsClient && IsOwner)
+                {
+                    AddCountHitServerRpc();
+                }
+               
             }
         }
 

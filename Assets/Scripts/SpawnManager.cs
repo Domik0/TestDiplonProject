@@ -18,9 +18,6 @@ public class SpawnManager:NetworkBehaviour
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
     private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
 
-    private void Awake()
-    {
-    }
 
     private void Start()
     {
@@ -29,8 +26,14 @@ public class SpawnManager:NetworkBehaviour
             rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
         }
         AddConnectPlayerServerRpc();
-        SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
-        SpawnBonusServerRpc();
+        int rndSpawnPointId;
+        do
+        {
+            rndSpawnPointId = Random.Range(0, 4);
+        }
+        while (listSpawnPlayer.Contains(rndSpawnPointId));
+        SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, rndSpawnPointId);
+        SpawnBonusServerRpc(rndSpawnPointId);
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -40,16 +43,11 @@ public class SpawnManager:NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerServerRpc(ulong localClientId)
+    private void SpawnPlayerServerRpc(ulong localClientId,int rndSpawnPointId)
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
-        int rndSpawnPointId;
-
-        do {
-            rndSpawnPointId = Random.Range(0, 4);
-        }
-        while(listSpawnPlayer.Contains(rndSpawnPointId));
+      
         listSpawnPlayer.Add(rndSpawnPointId);
 
         switch (rndSpawnPointId)
@@ -80,16 +78,10 @@ public class SpawnManager:NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnBonusServerRpc()
+    private void SpawnBonusServerRpc(int rndSpawnPointId)
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
-
-        int rndSpawnPointId = Random.Range(1, 4);
-        while (listSpawnPlayer.Contains(rndSpawnPointId))
-        {
-            rndSpawnPointId = Random.Range(1, 4);
-        }
 
         switch (rndSpawnPointId)
         {

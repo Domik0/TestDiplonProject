@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -17,6 +18,9 @@ namespace StarterAssets
         private TMP_InputField displayNameInputField;
 
         [SerializeField]
+        private TMP_InputField displayPortInputField;
+
+        [SerializeField]
         private GameObject errorPanel;
 
         [SerializeField] 
@@ -33,7 +37,18 @@ namespace StarterAssets
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                GameNetPortal.Instance.StartHost();
+                try
+                {
+                    GameNetPortal.Instance.StartHost();
+                }
+                catch (Exception e)
+                {
+                    textError.text = "Change port";
+
+                    errorPanel.SetActive(true);
+                    throw;
+                }
+                
             }
             
         }

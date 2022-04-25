@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Networking;
+using Cinemachine;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -15,16 +16,27 @@ namespace Assets.Scripts.UI
         [SerializeField]
         private NetworkVariable<NetworkString> playerNetworkName = new NetworkVariable<NetworkString>();
 
+        [SerializeField] private Transform mainCameraTransform;
+        [SerializeField] public GameObject billbord;
+
+
         private bool _overlaySet = false;
+
+        private void Awake()
+        {
+            mainCameraTransform = FindObjectOfType<Camera>().transform;
+        }
 
         private void Start()
         {
-            if (IsClient& IsOwner)
+            
+            if (IsClient & IsOwner)
             {
-                string nickName= PlayerPrefs.GetString("PlayerName");
+                string nickName = PlayerPrefs.GetString("PlayerName");
                 SetNicknameServerRpc(nickName);
             }
-          
+           
+
         }
 
         [ServerRpc]
@@ -49,6 +61,20 @@ namespace Assets.Scripts.UI
                 SetOverlay();
                 _overlaySet = true;
             }
+           
         }
+
+        private void LateUpdate()
+        {
+            if (mainCameraTransform != null)
+            {
+                //transform.position + mainCameraTransform.rotation * Vector3.forward, mainCameraTransform.rotation* Vector3.up
+                billbord.transform.LookAt(mainCameraTransform);
+                billbord.transform.Rotate(Vector3.up * 180);
+            }
+        }
+
+
+      
     }
 }

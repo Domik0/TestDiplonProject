@@ -85,7 +85,7 @@ namespace StarterAssets
         {
             DisconnectReason.SetDisconnectReason(ConnectStatus.UserRequestedDisconnect);
             NetworkManager.Singleton.Shutdown();
-
+           
             HandleClientDisconnect(NetworkManager.Singleton.LocalClientId);
 
             SceneManager.LoadScene("Scene_Menu");

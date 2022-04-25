@@ -1277,6 +1277,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4690c07f97c47ff47a2947a5f255ddb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCameraTransform: {fileID: 0}
+  billbord: {fileID: 8620372693091276847}
 --- !u!1 &4523139366846529165
 GameObject:
   m_ObjectHideFlags: 0
@@ -2646,7 +2648,6 @@ GameObject:
   - component: {fileID: 680845009666217548}
   - component: {fileID: 6186451053621461719}
   - component: {fileID: 2330841939114119381}
-  - component: {fileID: 6283161886360757188}
   m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
@@ -2736,18 +2737,6 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &6283161886360757188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8620372693091276847}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 877dca950cf7b86409023f4e3a054a33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8832014917856829317
 GameObject:
   m_ObjectHideFlags: 0

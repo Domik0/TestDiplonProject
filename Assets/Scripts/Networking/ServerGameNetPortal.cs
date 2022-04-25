@@ -20,7 +20,7 @@ namespace StarterAssets
         private Dictionary<ulong, string> clientIdToGuid;
         private Dictionary<ulong, int> clientSceneMap;
         private bool gameInProgress;
-
+        
         private const int MaxConnectionPayload = 1024;
 
         private GameNetPortal gameNetPortal;
@@ -44,6 +44,7 @@ namespace StarterAssets
 
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
+            
 
             clientData = new Dictionary<string, PlayerData>();
             clientIdToGuid = new Dictionary<ulong, string>();
