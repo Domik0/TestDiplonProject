@@ -45,22 +45,22 @@ namespace Assets.Scripts.UI
             if(personsList[0] != null)
             {
                 playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "1. " + "player" + personsList[0].timeTag.Value.ToString(@"mm\:ss");
+                playerOneText.text = "1. " + "player" + personsList[0].timeTag.ToString(@"mm\:ss");
             }
             if (personsList[1] != null)
             {
                 playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "2. " + "player" + personsList[1].timeTag.Value.ToString(@"mm\:ss");
+                playerOneText.text = "2. " + "player" + personsList[1].timeTag.ToString(@"mm\:ss");
             }
             if (personsList[2] != null)
             {
                 playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "3. " + "player" + personsList[2].timeTag.Value.ToString(@"mm\:ss");
+                playerOneText.text = "3. " + "player" + personsList[2].timeTag.ToString(@"mm\:ss");
             }
             if (personsList[3] != null)
             {
                 playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "4. " + "player" + personsList[3].timeTag.Value.ToString(@"mm\:ss");
+                playerOneText.text = "4. " + "player" + personsList[3].timeTag.ToString(@"mm\:ss");
             }
 
         }

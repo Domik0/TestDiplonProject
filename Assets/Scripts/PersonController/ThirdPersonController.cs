@@ -78,7 +78,7 @@ namespace StarterAssets
         [SerializeField]
         private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
         [SerializeField]
-        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
+        public TimeSpan timeTag = new TimeSpan();
         [SerializeField]
         public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
 
@@ -184,7 +184,7 @@ namespace StarterAssets
         {
             if (isTag.Value)
             {
-                timeTag.Value += TimeSpan.FromSeconds(Time.deltaTime);
+                timeTag += TimeSpan.FromSeconds(Time.deltaTime);
             }
         }
 
@@ -331,6 +331,11 @@ namespace StarterAssets
 
         private void ClientVisuals()
         {
+            if (_oldTag != isTag.Value)
+            {
+                _oldTag = isTag.Value;
+                СhangePlayerColor();
+            }
 
             if (_oldPlayerState != networkPlayerState.Value)
             {
@@ -379,11 +384,7 @@ namespace StarterAssets
 
             }
 
-            if (_oldTag != isTag.Value)
-            {
-                _oldTag = isTag.Value;
-                СhangePlayerColor(isTag.Value);
-            }
+          
         }
 
 
@@ -425,7 +426,7 @@ namespace StarterAssets
             GroundNetwork.Value = isGround;
         }
 
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
         {
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
@@ -612,10 +613,10 @@ namespace StarterAssets
                             UpdateTagServerRpc(true, playerHit.OwnerClientId);
                         }
 
-                        if (!isTag.Value)
-                        {
-                            UpdateTagServerRpc(false, playerHit.OwnerClientId);
-                        }
+                        //if (!isTag.Value)
+                        //{
+                        //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                        //}
                     }
                 }
                     break;
@@ -629,9 +630,9 @@ namespace StarterAssets
             }
         }
 
-        private void СhangePlayerColor(bool tag)
+        private void СhangePlayerColor()
         {
-            if (!tag)
+            if (isTag.Value==false)
             {
                 foreach (var items in myObject.materials)
                 {
@@ -639,7 +640,7 @@ namespace StarterAssets
                 }
             }
 
-            if (tag)
+            if (isTag.Value == true)
             {
                 foreach (var items in myObject.materials)
                 {
