@@ -792,7 +792,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1653831418}
-  - component: {fileID: 1653831420}
   - component: {fileID: 1653831419}
   m_Layer: 0
   m_Name: StatLisUI
@@ -833,22 +832,6 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &1653831420
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1653831417}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0b312ad3e8105149b688dcb69725677, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerOneText: {fileID: 466410587}
-  playerSecondText: {fileID: 2062578883}
-  playerThirdText: {fileID: 2106855799}
-  playerFourthText: {fileID: 1884317339}
 --- !u!1 &1759184151
 GameObject:
   m_ObjectHideFlags: 0
@@ -858,6 +841,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1759184152}
+  - component: {fileID: 1759184153}
   m_Layer: 0
   m_Name: Players
   m_TagString: Untagged
@@ -889,6 +873,23 @@ RectTransform:
   m_AnchoredPosition: {x: -0, y: -21}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1759184153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1759184151}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0b312ad3e8105149b688dcb69725677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  listText:
+  - {fileID: 466410587}
+  - {fileID: 2062578883}
+  - {fileID: 2106855799}
+  - {fileID: 1884317339}
 --- !u!1 &1823517436
 GameObject:
   m_ObjectHideFlags: 0

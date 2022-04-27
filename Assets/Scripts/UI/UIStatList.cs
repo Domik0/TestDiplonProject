@@ -13,10 +13,8 @@ namespace Assets.Scripts.UI
     class UIStatList : NetworkSingleton<UIManager>
     {
 
-        public TextMeshProUGUI playerOneText;
-        public TextMeshProUGUI playerSecondText;
-        public TextMeshProUGUI playerThirdText;
-        public TextMeshProUGUI playerFourthText;
+        public List<TextMeshProUGUI> listText;
+       
 
         private List<ThirdPersonController> personsList = new List<ThirdPersonController>();
 
@@ -25,7 +23,7 @@ namespace Assets.Scripts.UI
             if (IsServer)
             {
                 GetPersonControllers();
-                GenerateStatPersonServerRpc();
+                GenerateStatPersonClientRpc();
             }
         }
 
@@ -39,29 +37,38 @@ namespace Assets.Scripts.UI
             personsList.OrderBy(p => p.timeTag);
         }
 
-        [ServerRpc]
-        private void GenerateStatPersonServerRpc()
+        [ClientRpc]
+        private void GenerateStatPersonClientRpc()
         {
-            if(personsList[0] != null)
+            for (int i = 0; i < personsList.Count; i++)
             {
-                playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "1. " + "player" + personsList[0].timeTag.ToString(@"mm\:ss");
+                if (personsList[i] != null)
+                {
+                    listText[i].gameObject.SetActive(true);
+                    listText[i].text = $"{i+1} player {personsList[0].timeTag.ToString(@"mm\:ss")}";
+                }
             }
-            if (personsList[1] != null)
-            {
-                playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "2. " + "player" + personsList[1].timeTag.ToString(@"mm\:ss");
-            }
-            if (personsList[2] != null)
-            {
-                playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "3. " + "player" + personsList[2].timeTag.ToString(@"mm\:ss");
-            }
-            if (personsList[3] != null)
-            {
-                playerOneText.gameObject.SetActive(true);
-                playerOneText.text = "4. " + "player" + personsList[3].timeTag.ToString(@"mm\:ss");
-            }
+            //if(personsList[0] != null)
+            //{
+            //    playerOneText.gameObject.SetActive(true);
+            //    playerOneText.text = "1. " + "player" + personsList[0].timeTag.ToString(@"mm\:ss");
+            //}
+            //if (personsList[1] != null)
+            //{
+            //    playerOneText.gameObject.SetActive(true);
+            //    playerOneText.text = "2. " + "player" + personsList[1].timeTag.ToString(@"mm\:ss");
+            //}
+            //if (personsList[2] != null)
+            //{
+            //    playerOneText.gameObject.SetActive(true);
+            //    playerOneText.text = "3. " + "player" + personsList[2].timeTag.ToString(@"mm\:ss");
+            //}
+            //if (personsList[3] != null)
+            //{
+            //    playerOneText.gameObject.SetActive(true);
+            //    playerOneText.text = "4. " + "player" + personsList[3].timeTag.ToString(@"mm\:ss");
+            //}
+
 
         }
 
