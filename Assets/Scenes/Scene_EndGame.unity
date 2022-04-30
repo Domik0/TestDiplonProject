@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -379,7 +379,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &466410586
 RectTransform:
   m_ObjectHideFlags: 0
@@ -532,10 +532,10 @@ RectTransform:
   m_Father: {fileID: 143158224}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 13.40625, y: -5}
-  m_SizeDelta: {x: 600, y: 500}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 13.40625, y: -5.000061}
+  m_SizeDelta: {x: -1556, y: -462}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &505719704
 MonoBehaviour:
@@ -792,8 +792,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1653831418}
-  - component: {fileID: 1653831420}
   - component: {fileID: 1653831419}
+  - component: {fileID: 1653831420}
   m_Layer: 0
   m_Name: StatLisUI
   m_TagString: Untagged
@@ -845,10 +845,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0b312ad3e8105149b688dcb69725677, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerOneText: {fileID: 466410587}
-  playerSecondText: {fileID: 2062578883}
-  playerThirdText: {fileID: 2106855799}
-  playerFourthText: {fileID: 1884317339}
+  ListGameObjects:
+  - {fileID: 5287089691064055494, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
+  - {fileID: 8690602228867113167, guid: e6fd1715965d63043a413dea8f583622, type: 3}
+  listText:
+  - {fileID: 466410587}
+  - {fileID: 2062578883}
+  - {fileID: 2106855799}
+  - {fileID: 1884317339}
 --- !u!1 &1759184151
 GameObject:
   m_ObjectHideFlags: 0
@@ -1125,7 +1129,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1884317338
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1354,7 +1358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2062578882
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1565,7 +1569,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2106855798
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1767,9 +1771,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: StarterAssets.MainMenuUI, Assembly-CSharp
-        m_MethodName: OnClientClicked
+      - m_Target: {fileID: 1653831420}
+        m_TargetAssemblyTypeName: Assets.Scripts.UI.UIStatList, Assembly-CSharp
+        m_MethodName: ExitClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.Networking;
 using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -77,8 +78,11 @@ namespace StarterAssets
         private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
         [SerializeField]
         private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
+        [SerializeField] 
+        public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
         [SerializeField]
-        public TimeSpan timeTag = new TimeSpan();
+        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
+        
         [SerializeField]
         public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
 
@@ -93,11 +97,8 @@ namespace StarterAssets
         private bool _oldTag;
 
         // player
-        private bool _climbing;
-        private bool _climbingZone;
         private float _speed;
         private float _animationBlend;
-
         private float _targetRotation = 0.0f;
         private float _rotationVelocity;
         private float _verticalVelocity;
@@ -112,16 +113,7 @@ namespace StarterAssets
         private float _danceTimeoutDelta;
         private float _punchTimeoutDelta;
 
-        // animation IDs
-        private int _animIDSpeed;
-        private int _animIDGrounded;
-        private int _animIDJump;
-        private int _animIDFreeFall;
-        private int _animIDMotionSpeed;
-        private int _animIDDance;
-        private int _animIDDanceID;
-        private int _animIDClimbingUp;
-        private int _animIDClimbingDown;
+       
 
 
         private Animator _animator;
@@ -152,22 +144,24 @@ namespace StarterAssets
                 _animator = GetComponent<Animator>();
                 _hasAnimator = TryGetComponent(out _animator);
                 UICanvasControllerInput.Instance.FollowPlayer(_input);
-                //СhangePlayerColor(gameObject.tag);
-                AssignAnimationIDs();
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
+                string nickName = PlayerPrefs.GetString("PlayerName");
+                SetNicknameServerRpc(nickName);
             }
 
+        }
+
+        [ServerRpc]
+        private void SetNicknameServerRpc(string name)
+        {
+            nickName.Value = name;
         }
 
         private void Update()
         {
             if (IsClient && IsOwner)
             {
-                //if (!_climbing)
-                //{
-                //}
-                //Climbing();
                 GroundedCheck();
                 JumpAndGravity();
                 ClientMove();
@@ -184,9 +178,18 @@ namespace StarterAssets
         {
             if (isTag.Value)
             {
-                timeTag += TimeSpan.FromSeconds(Time.deltaTime);
+                
+                UpdateTagTimeServerRpc();
             }
         }
+
+        [ServerRpc]
+        private void UpdateTagTimeServerRpc()
+        {
+            timeTag.Value += TimeSpan.FromSeconds(Time.deltaTime);
+        }
+
+
 
         private void LateUpdate()
         {
@@ -196,18 +199,6 @@ namespace StarterAssets
             }
         }
 
-        private void AssignAnimationIDs()
-        {
-            _animIDSpeed = Animator.StringToHash("Speed");
-            _animIDGrounded = Animator.StringToHash("Grounded");
-            _animIDJump = Animator.StringToHash("Jump");
-            _animIDFreeFall = Animator.StringToHash("FreeFall");
-            _animIDMotionSpeed = Animator.StringToHash("MotionSpeed");
-            _animIDDance = Animator.StringToHash("Dance");
-            _animIDDanceID = Animator.StringToHash("DanceID");
-            _animIDClimbingUp = Animator.StringToHash("ClimbingUp");
-            _animIDClimbingDown = Animator.StringToHash("ClimbingDown");
-        }
 
         private void Beating()
         {
@@ -648,5 +639,7 @@ namespace StarterAssets
                 }
             }
         }
+
+        
     }
 }
