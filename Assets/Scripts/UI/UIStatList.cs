@@ -6,68 +6,73 @@ using System.Threading.Tasks;
 using Assets.Scripts.Networking;
 using StarterAssets;
 using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace Assets.Scripts.UI
 {
-    class UIStatList : NetworkSingleton<UIManager>
+    class UIStatList : NetworkSingleton<UIStatList>
     {
 
+        public List<NetworkObject> ListGameObjects;
         public List<TextMeshProUGUI> listText;
-       
 
         private List<ThirdPersonController> personsList = new List<ThirdPersonController>();
 
+        private  NetworkList<PlayerStat> cooList = new NetworkList<PlayerStat>();
+
+
         void Start()
         {
+
             if (IsServer)
             {
-                GetPersonControllers();
-                GenerateStatPersonClientRpc();
-            }
-        }
-
-        private void GetPersonControllers()
-        {
-            foreach (var person in NetworkManager.Singleton.ConnectedClients)
-            {
-                personsList.Add(person.Value.PlayerObject.GetComponent<ThirdPersonController>());
-            }
-
-            personsList.OrderBy(p => p.timeTag);
-        }
-
-        [ClientRpc]
-        private void GenerateStatPersonClientRpc()
-        {
-            for (int i = 0; i < personsList.Count; i++)
-            {
-                if (personsList[i] != null)
+                DestroyAllObjectServerRpc();
+                foreach (var person in NetworkManager.Singleton.ConnectedClients)
                 {
-                    listText[i].gameObject.SetActive(true);
-                    listText[i].text = $"{i+1} player {personsList[0].timeTag.ToString(@"mm\:ss")}";
+                    personsList.Add(person.Value.PlayerObject.GetComponent<ThirdPersonController>());
+                }
+
+                personsList.OrderByDescending(p => p.timeTag.Value);
+                for (int i = 0; i < personsList.Count; i++)
+                {
+                    if (personsList[i] != null)
+                    {
+
+                        cooList.Add(new PlayerStat()
+                        {
+                            PlayerNum = i + 1,
+                            PlayerName = new FixedString32Bytes(personsList[i].nickName.Value),
+                            TimeTag = personsList[i].timeTag.Value
+                        });
+                    }
                 }
             }
-            //if(personsList[0] != null)
-            //{
-            //    playerOneText.gameObject.SetActive(true);
-            //    playerOneText.text = "1. " + "player" + personsList[0].timeTag.ToString(@"mm\:ss");
-            //}
-            //if (personsList[1] != null)
-            //{
-            //    playerOneText.gameObject.SetActive(true);
-            //    playerOneText.text = "2. " + "player" + personsList[1].timeTag.ToString(@"mm\:ss");
-            //}
-            //if (personsList[2] != null)
-            //{
-            //    playerOneText.gameObject.SetActive(true);
-            //    playerOneText.text = "3. " + "player" + personsList[2].timeTag.ToString(@"mm\:ss");
-            //}
-            //if (personsList[3] != null)
-            //{
-            //    playerOneText.gameObject.SetActive(true);
-            //    playerOneText.text = "4. " + "player" + personsList[3].timeTag.ToString(@"mm\:ss");
-            //}
+            GenerateStatPerson();
+        }
+
+
+
+        [ServerRpc]
+        private void DestroyAllObjectServerRpc()
+        {
+            var list = GameObject.FindGameObjectsWithTag("Player").Union(GameObject.FindGameObjectsWithTag("Chest"));
+            foreach (var item in list)
+            {
+                Destroy(item);
+            }
+        }
+
+
+        private void GenerateStatPerson()
+        {
+            for (int i = 0; i < cooList.Count; i++)
+            {
+
+                listText[i].gameObject.SetActive(true);
+                listText[i].text = $"{cooList[i].PlayerNum} {cooList[i].PlayerName.Value} {cooList[i].TimeTag.ToString(@"mm\:ss")}";
+            }
 
 
         }

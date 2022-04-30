@@ -73,6 +73,7 @@ public class SpawnManager : NetworkBehaviour
         if (loudingCount.Value == rndTag.Value)
         {
             go.GetComponent<ThirdPersonController>().isTag.Value = true;
+            go.GetComponent<ThirdPersonController>().timeTag.Value -= TimeSpan.FromSeconds(UIManager.Instance.loadingSeconds);
         }
         go.SpawnAsPlayerObject(localClientId);
     }

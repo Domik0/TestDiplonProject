@@ -39,7 +39,6 @@ public class UIManager : NetworkSingleton<UIManager>
                 if (currentTime.Value <= TimeSpan.Zero)
                 {
                     timerActive = false;
-                    //GameNetPortal.Instance.RequestDisconnect();
                     NetworkManager.Singleton.SceneManager.LoadScene("Scene_EndGame", LoadSceneMode.Single);
                 }
             }
