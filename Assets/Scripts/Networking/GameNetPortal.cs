@@ -15,11 +15,9 @@ namespace StarterAssets
 
         public event Action<ConnectStatus> OnConnectionFinished;
         public event Action<ConnectStatus> OnDisconnectReasonReceived;
-
-
         public event Action<ulong, int> OnClientSceneChanged;
-
         public event Action OnUserDisconnectRequested;
+       
 
 
         private void Awake()
@@ -60,6 +58,7 @@ namespace StarterAssets
 
         public void StartHost()
         {
+            
             NetworkManager.Singleton.StartHost();
 
             RegisterClientMessageHandlers();

@@ -1154,8 +1154,6 @@ MonoBehaviour:
     m_InternalValue: 0
   animFallNetwork:
     m_InternalValue: 0
-  countHits:
-    m_InternalValue: 0
   isTag:
     m_InternalValue: 0
 --- !u!114 &5885216827943657505
@@ -1172,7 +1170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 1
   canPush: 1
   strength: 1.1
 --- !u!114 &135756642000475821

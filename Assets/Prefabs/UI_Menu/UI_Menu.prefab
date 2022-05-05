@@ -529,7 +529,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter Port
+  m_text: Enter JOIN CODE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 66bada3a37cac8b4cb792037908c8609, type: 2}
   m_sharedMaterial: {fileID: -2735389647746514628, guid: 66bada3a37cac8b4cb792037908c8609, type: 2}
@@ -787,7 +787,7 @@ GameObject:
   - component: {fileID: 1304115803235490466}
   - component: {fileID: 5489817849965048973}
   m_Layer: 5
-  m_Name: Port
+  m_Name: JOIN CODE
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

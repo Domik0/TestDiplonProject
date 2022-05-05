@@ -55,7 +55,7 @@ namespace StarterAssets
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
         }
 
-        public void StartClient()
+        public  void StartClient(string joinCode)
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload()
             {
@@ -67,8 +67,12 @@ namespace StarterAssets
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-
+            
+            
             NetworkManager.Singleton.StartClient();
+            
+          
+            
         }
 
         private void HandleNetworkReadied()

@@ -19,7 +19,7 @@ namespace StarterAssets
         private TMP_InputField displayNameInputField;
 
         [SerializeField]
-        private TMP_InputField displayPortInputField;
+        private TMP_InputField displayJoinInputField;
 
         [SerializeField]
         private GameObject errorPanel;
@@ -27,46 +27,52 @@ namespace StarterAssets
         [SerializeField] 
         private TextMeshProUGUI textError;
 
-        [SerializeField]
-        private GameObject goUNetTransport;
-
-        private UNetTransport uNetTransport;
+       
 
 
         private void Start()
         {
-            uNetTransport = goUNetTransport.GetComponent<UNetTransport>();
             PlayerPrefs.GetString("PlayerName");
-            displayPortInputField.text = uNetTransport.ConnectPort.ToString();
         }
 
-        public void OnHostClicked()
+        public async void OnHostClicked()
         {
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                try
+                if (RelayManager.Instance.IsRelayEnabled)
                 {
-                    GameNetPortal.Instance.StartHost();
+                    await RelayManager.Instance.SetupRelay();
                 }
-                catch (Exception e)
-                {
-                    textError.text = "Change port";
-
-                    errorPanel.SetActive(true);
-                    throw;
-                }
-                
+                GameNetPortal.Instance.StartHost();
             }
             
         }
 
-        public void OnClientClicked()
+        public async void OnClientClicked()
         {
             PlayerPrefs.SetString("PlayerName", displayNameInputField.text);
             if (CheckNickname())
             {
-                ClientGameNetPortal.Instance.StartClient();
+                if (RelayManager.Instance.IsRelayEnabled && !string.IsNullOrEmpty(displayJoinInputField.text))
+                {
+                    try
+                    {
+                        await RelayManager.Instance.JoinRelay(displayJoinInputField.text);
+                        ClientGameNetPortal.Instance.StartClient(displayJoinInputField.text);
+                    }
+                    catch (Exception e)
+                    {
+
+                        errorPanel.SetActive(true);
+                        textError.text = "Join code don't work";
+                    }
+                }
+                else
+                {
+                    errorPanel.SetActive(true);
+                    textError.text = "Unable start client";
+                }
             }
         }
 
@@ -74,8 +80,8 @@ namespace StarterAssets
         {
             if (displayNameInputField.text == "")
             {
-                textError.text = "Enter nickname";
                 errorPanel.SetActive(true);
+                textError.text = "Enter Nickname";
                 return false;
             }
             return true;

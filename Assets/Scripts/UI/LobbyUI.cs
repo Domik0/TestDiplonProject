@@ -1,5 +1,7 @@
 using System.Linq;
 using System.Threading;
+using Assets.Scripts.Networking;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +18,9 @@ namespace StarterAssets
         [SerializeField] private LobbyPlayerCard[] lobbyPlayerCards;
         [SerializeField] private GameObject errorPanel;
         [SerializeField] private Button startGameButton;
+        [SerializeField] private TextMeshProUGUI joinCodeTextMeshProUgui;
         [SerializeField] private NetworkVariable<bool> hostExists;
+        [SerializeField] private NetworkVariable<NetworkString> joinCode;
         private NetworkList<LobbyPlayerState> lobbyPlayers;
 
         private void Awake()
@@ -35,6 +39,7 @@ namespace StarterAssets
 
         public override void OnNetworkSpawn()
         {
+            
             if (IsClient)
             {
                 lobbyPlayers.OnListChanged += HandleLobbyPlayersStateChanged;
@@ -43,7 +48,7 @@ namespace StarterAssets
             if (IsServer)
             {
                 startGameButton.gameObject.SetActive(true);
-
+                joinCode.Value = RelayManager.Instance.joinCode;
                 NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
                 NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
 
@@ -52,6 +57,7 @@ namespace StarterAssets
                     HandleClientConnected(client.ClientId);
                 }
             }
+            joinCodeTextMeshProUgui.text = $"JOIN CODE: {joinCode.Value}";
         }
 
         public override void OnDestroy()
