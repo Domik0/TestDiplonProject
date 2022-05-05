@@ -206,6 +206,13 @@ namespace StarterAssets
             StartGameServerRpc();
         }
 
+        /// <summary>
+        /// Метод окопирует JOIN CODE в буфер обмена
+        /// </summary>
+        public void OnCopyJoinCode()
+        {
+            GUIUtility.systemCopyBuffer = joinCode.Value;
+        }
 
         /// <summary>
         /// Метод обновляет состояние мест игроков
