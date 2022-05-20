@@ -16,8 +16,6 @@ namespace StarterAssets
         public float MoveSpeed = 2.0f;
         [Tooltip("Sprint speed of the character in m/s")]
         public float SprintSpeed = 5.335f;
-        [Tooltip("Climbing speed of the character in m/s")]
-        public float ClimbingSpeed = 0.5f;
         [Tooltip("How fast the character turns to face movement direction")]
         [Range(0.0f, 0.3f)]
         public float RotationSmoothTime = 0.12f;
@@ -146,17 +144,12 @@ namespace StarterAssets
                 UICanvasControllerInput.Instance.FollowPlayer(_input);
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
-                string nickName = PlayerPrefs.GetString("PlayerName");
-                SetNicknameServerRpc(nickName);
+              
             }
 
         }
 
-        [ServerRpc]
-        private void SetNicknameServerRpc(string name)
-        {
-            nickName.Value = name;
-        }
+      
 
         private void Update()
         {
@@ -176,9 +169,8 @@ namespace StarterAssets
 
         private void TimeTagChange()
         {
-            if (isTag.Value)
+            if (isTag.Value && UIManager.Instance.timerActive.Value)
             {
-                
                 UpdateTagTimeServerRpc();
             }
         }
@@ -222,10 +214,7 @@ namespace StarterAssets
         {
             if (_input.throwObject)
             {
-                if (_hasAnimator)
-                {
-                    _animator.SetTrigger("Throw");
-                }
+                _animator.SetTrigger("Throw");
             }
         }
 
@@ -289,7 +278,7 @@ namespace StarterAssets
                 _speed = targetSpeed;
             }
 
-             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
             // normalise input direction
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
@@ -308,15 +297,11 @@ namespace StarterAssets
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
+            UpdatePlayerStateServerRpc(PlayerState.Move);
+            UpdateAnimationBlendServerRpc(_animationBlend);
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
             // update animator if using character
-            if (_hasAnimator)
-            {
-                UpdatePlayerStateServerRpc(PlayerState.Move);
-                UpdateAnimationBlendServerRpc(_animationBlend);
-
-            }
         }
 
 
@@ -332,18 +317,8 @@ namespace StarterAssets
             {
                 _oldPlayerState = networkPlayerState.Value;
             }
-            if (networkPlayerState.Value == PlayerState.Dance)
-            {
 
-                if (_oldDanceId != networkDanceId.Value)
-                {
-                    _oldDanceId = networkDanceId.Value;
-                    _animator.SetFloat("DanceID", networkDanceId.Value);
-                    _animator.SetTrigger("Dance");
-                }
-            }
-
-            if (networkPlayerState.Value == PlayerState.Move)
+            if(networkPlayerState.Value == PlayerState.Move)
             {
                 if (_oldAnimationBlend != networkAnimationBlend.Value)
                 {
@@ -367,12 +342,23 @@ namespace StarterAssets
                     _oldGround = GroundNetwork.Value;
                     _animator.SetBool("Grounded", GroundNetwork.Value);
                 }
+                return;
             }
 
+            if (networkPlayerState.Value == PlayerState.Dance)
+            {
+
+                if (_oldDanceId != networkDanceId.Value)
+                {
+                    _oldDanceId = networkDanceId.Value;
+                    _animator.SetFloat("DanceID", networkDanceId.Value);
+                    _animator.SetTrigger("Dance");
+                }
+                return;
+            }
             if (networkPlayerState.Value == PlayerState.Punch)
             {
                 _animator.SetTrigger("Punch");
-
             }
 
           
@@ -384,7 +370,6 @@ namespace StarterAssets
         private void UpdatePlayerStateServerRpc(PlayerState state)
         {
             networkPlayerState.Value = state;
-
         }
 
         [ServerRpc]
@@ -450,21 +435,6 @@ namespace StarterAssets
             return false;
         }
 
-        private void CheckPunch(Transform hand, Vector3 aimDirection)
-        {
-            RaycastHit hit;
-
-            int layerMask = LayerMask.GetMask("Player");
-
-            if (Physics.Raycast(hand.position, hand.transform.TransformDirection(aimDirection), out hit, minPucnhDistance, layerMask))
-            {
-                Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.yellow);
-            }
-            else
-            {
-                Debug.DrawRay(hand.position, hand.transform.TransformDirection(aimDirection) * minPucnhDistance, Color.red);
-            }
-        }
 
         [ClientRpc]
         private void NotifyHealthChangedClientRpc(bool takeAwayPoint, ClientRpcParams clientRpcParams)
@@ -483,15 +453,13 @@ namespace StarterAssets
                 _fallTimeoutDelta = FallTimeout;
 
                 // update animator if using character
-                if (_hasAnimator)
-                {
+                
                     UpdateJumpServerRpc(false);
                     UpdateFallServerRpc(false);
                     //_animator.SetBool(_animIDJump, false);
                     //_animator.SetBool(_animIDFreeFall, false);
-                }
 
-                // stop our velocity dropping infinitely when grounded
+                    // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
                 {
                     _verticalVelocity = -2f;
@@ -504,12 +472,10 @@ namespace StarterAssets
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        //   UpdatePlayerStateServerRpc(PlayerState.Jump);
+                    //   UpdatePlayerStateServerRpc(PlayerState.Jump);
                         UpdateJumpServerRpc(true);
                         //_animator.SetBool(_animIDJump, true);
-                    }
+                    
                 }
 
                 // jump timeout
@@ -531,11 +497,9 @@ namespace StarterAssets
                 else
                 {
                     // update animator if using character
-                    if (_hasAnimator)
-                    {
+                    
                         UpdateFallServerRpc(true);
                         //_animator.SetBool(_animIDFreeFall, true);
-                    }
                 }
 
                 // if we are not grounded, do not jump
@@ -563,7 +527,7 @@ namespace StarterAssets
             {
                 if (GroundNetwork.Value)
                 {
-                    if (_hasAnimator && _danceTimeoutDelta <= 0.0f)
+                    if ( _danceTimeoutDelta <= 0.0f)
                     {
                         _danceTimeoutDelta = DanceTimeout;
 
@@ -623,7 +587,7 @@ namespace StarterAssets
 
         private void СhangePlayerColor()
         {
-            if (isTag.Value==false)
+            if (!isTag.Value)
             {
                 foreach (var items in myObject.materials)
                 {
@@ -631,7 +595,7 @@ namespace StarterAssets
                 }
             }
 
-            if (isTag.Value == true)
+            if (isTag.Value)
             {
                 foreach (var items in myObject.materials)
                 {

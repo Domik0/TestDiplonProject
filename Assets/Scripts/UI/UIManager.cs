@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 public class UIManager : NetworkSingleton<UIManager>
 {
-    private bool timerActive = true;
+    public NetworkVariable<bool> timerActive=new NetworkVariable<bool>();
     private NetworkVariable<TimeSpan> currentTime = new NetworkVariable<TimeSpan>();
     private NetworkVariable<TimeSpan> startTime = new NetworkVariable<TimeSpan>();
     public int startMinutes;
@@ -23,9 +23,23 @@ public class UIManager : NetworkSingleton<UIManager>
 
     void Start()
     {
-        if (IsServer)
+        NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+        NetworkManager.SceneManager.OnSynchronizeComplete += SceneManager_OnSynchronizeComplete; ;
+
+    }
+
+    private void SceneManager_OnSynchronizeComplete(ulong clientId)
+    {
+        Buttons.SetActive(false);
+    }
+
+    private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    {
+        if (sceneName == "Scene_Main")
         {
-            UpdateCurentTimeServerRpc();
+            timerActive.Value = true;
+            currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60 + loadingSeconds);
+            startTime.Value = TimeSpan.Zero;
         }
     }
 
@@ -33,25 +47,23 @@ public class UIManager : NetworkSingleton<UIManager>
     {
         if (IsServer)
         {
-            if (timerActive)
+            if (timerActive.Value)
             {
+               
                 UpdateTimeGameServerRpc();
                 if (currentTime.Value <= TimeSpan.Zero)
                 {
-                    timerActive = false;
-                    NetworkManager.Singleton.SceneManager.LoadScene("Scene_EndGame", LoadSceneMode.Single);
+                    StopTimeServerRpc();
+                    SceneLoaderWrapper.Instance.LoadScene("Scene_EndGame", true);
                 }
             }
         }
-
-        if (startTime.Value >= TimeSpan.FromSeconds(loadingSeconds))
-        {
-            LoadindScene.SetActive(false);
-            Buttons.SetActive(true);
-        }
-        
         currentTimeText.text = currentTime.Value.ToString(@"mm\:ss");
+      
     }
+
+
+    
 
     [ServerRpc]
     void UpdateTimeGameServerRpc()
@@ -60,21 +72,23 @@ public class UIManager : NetworkSingleton<UIManager>
         startTime.Value += TimeSpan.FromSeconds(Time.deltaTime);
     }
 
+    //[ServerRpc]
+    //void UpdateCurentTimeServerRpc()
+    //{
+    //    currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60 + loadingSeconds);
+    //    startTime.Value = TimeSpan.Zero;
+    //}
+
     [ServerRpc]
-    void UpdateCurentTimeServerRpc()
+    public void StartTimerServerRpc()
     {
-        currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60 + loadingSeconds);
-        startTime.Value = TimeSpan.Zero;
+        
+        
     }
 
-
-    public void StartTimer()
+    [ServerRpc]
+    public void StopTimeServerRpc()
     {
-        timerActive = true;
-    }
-
-    public void StopTimer()
-    {
-        timerActive = false;
+        timerActive.Value = false;
     }
 }

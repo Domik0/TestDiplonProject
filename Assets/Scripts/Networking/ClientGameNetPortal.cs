@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using Assets.Scripts.Networking;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -35,11 +36,11 @@ namespace StarterAssets
         private void Start()
         {
             gameNetPortal = GetComponent<GameNetPortal>();
-
             gameNetPortal.OnNetworkReadied += HandleNetworkReadied;
             gameNetPortal.OnConnectionFinished += HandleConnectionFinished;
             gameNetPortal.OnDisconnectReasonReceived += HandleDisconnectReasonReceived;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+            
         }
 
         private void OnDestroy()
@@ -68,11 +69,12 @@ namespace StarterAssets
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
             
-            
+
             NetworkManager.Singleton.StartClient();
-            
-          
-            
+            SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
+
+
+
         }
 
         private void HandleNetworkReadied()
