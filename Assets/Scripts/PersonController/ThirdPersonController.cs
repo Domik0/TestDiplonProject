@@ -297,10 +297,11 @@ namespace StarterAssets
             Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
 
             // move the player
-            UpdatePlayerStateServerRpc(PlayerState.Move);
-            UpdateAnimationBlendServerRpc(_animationBlend);
+          ;
             _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-
+                //  UpdatePlayerStateServerRpc(PlayerState.Move);
+            Debug.Log("Speed"+_animationBlend);
+            UpdateAnimationBlendServerRpc(_animationBlend);
             // update animator if using character
         }
 
@@ -313,53 +314,52 @@ namespace StarterAssets
                 СhangePlayerColor();
             }
 
-            if (_oldPlayerState != networkPlayerState.Value)
-            {
-                _oldPlayerState = networkPlayerState.Value;
-            }
+            ////if (_oldPlayerState != networkPlayerState.Value)
+            ////{
+            ////    _oldPlayerState = networkPlayerState.Value;
+            ////}
 
-            if(networkPlayerState.Value == PlayerState.Move)
-            {
-                if (_oldAnimationBlend != networkAnimationBlend.Value)
-                {
-                    _oldAnimationBlend = networkAnimationBlend.Value;
-                    _animator.SetFloat("Speed", networkAnimationBlend.Value);
-                }
-                if (_oldAnimFall != animFallNetwork.Value)
-                {
-                    _oldAnimFall = animFallNetwork.Value;
-                    _animator.SetBool("FreeFall", animFallNetwork.Value);
-                }
+            //if(networkPlayerState.Value == PlayerState.Move)
+            //{
+            //    //if (_oldAnimationBlend != networkAnimationBlend.Value)
+            //    //{
+            //    //    _oldAnimationBlend = networkAnimationBlend.Value;
+            //    //}
+            //    //if (_oldAnimFall != animFallNetwork.Value)
+            //    //{
+            //    //    _oldAnimFall = animFallNetwork.Value;
+            //    //    //_animator.SetBool("FreeFall", animFallNetwork.Value);
+            //    //}
 
-                if (_oldAnimJump != animJumpNetwork.Value)
-                {
-                    _oldAnimJump = animJumpNetwork.Value;
-                    _animator.SetBool("Jump", animJumpNetwork.Value);
-                }
+            //    //if (_oldAnimJump != animJumpNetwork.Value)
+            //    //{
+            //    //    _oldAnimJump = animJumpNetwork.Value;
+            //    //    _animator.SetBool("Jump", animJumpNetwork.Value);
+            //    //}
 
-                if (_oldGround != GroundNetwork.Value)
-                {
-                    _oldGround = GroundNetwork.Value;
-                    _animator.SetBool("Grounded", GroundNetwork.Value);
-                }
-                return;
-            }
+            //    //if (_oldGround != GroundNetwork.Value)
+            //    //{
+            //    //    _oldGround = GroundNetwork.Value;
+            //    //    _animator.SetBool("Grounded", GroundNetwork.Value);
+            //    //}
+                
+            //}
 
-            if (networkPlayerState.Value == PlayerState.Dance)
-            {
+            //if (networkPlayerState.Value == PlayerState.Dance)
+            //{
 
-                if (_oldDanceId != networkDanceId.Value)
-                {
-                    _oldDanceId = networkDanceId.Value;
-                    _animator.SetFloat("DanceID", networkDanceId.Value);
-                    _animator.SetTrigger("Dance");
-                }
-                return;
-            }
-            if (networkPlayerState.Value == PlayerState.Punch)
-            {
-                _animator.SetTrigger("Punch");
-            }
+            //    //if (_oldDanceId != networkDanceId.Value)
+            //    //{
+            //    //    _oldDanceId = networkDanceId.Value;
+            //    //    _animator.SetFloat("DanceID", networkDanceId.Value);
+            //    //    _animator.SetTrigger("Dance");
+            //    //}
+            //    //return;
+            //}
+            //if (networkPlayerState.Value == PlayerState.Punch)
+            //{
+            //    _animator.SetTrigger("Punch");
+            //}
 
           
         }
@@ -375,31 +375,43 @@ namespace StarterAssets
         [ServerRpc]
         private void UpdateDanceIdServerRpc(int danceId)
         {
-            networkDanceId.Value = danceId;
+            _animator.SetTrigger("Dance");
+            _animator.SetFloat("DanceID", danceId);
+           
         }
 
         [ServerRpc]
         private void UpdateAnimationBlendServerRpc(float blend)
         {
             networkAnimationBlend.Value = blend;
+            UpdateAnimationBlendClientRpc();
+
+        }
+
+        [ClientRpc]
+        private void UpdateAnimationBlendClientRpc()
+        {
+            _animator.SetFloat("Speed", networkAnimationBlend.Value);
         }
 
         [ServerRpc]
         private void UpdateJumpServerRpc(bool isJump)
         {
-            animJumpNetwork.Value = isJump;
+            _animator.SetBool("Jump", isJump);
         }
 
         [ServerRpc]
         private void UpdateFallServerRpc(bool isFall)
         {
             animFallNetwork.Value = isFall;
+            _animator.SetBool("FreeFall", isFall);
         }
 
         [ServerRpc]
         private void UpdateGroundServerRpc(bool isGround)
         {
             GroundNetwork.Value = isGround;
+            _animator.SetBool("Grounded", isGround);
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -469,11 +481,12 @@ namespace StarterAssets
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
+                    UpdateJumpServerRpc(true);
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
                     // update animator if using character
                     //   UpdatePlayerStateServerRpc(PlayerState.Jump);
-                        UpdateJumpServerRpc(true);
+                       
                         //_animator.SetBool(_animIDJump, true);
                     
                 }

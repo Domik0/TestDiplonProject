@@ -23,8 +23,8 @@ public class UIManager : NetworkSingleton<UIManager>
 
     void Start()
     {
-        NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
-        NetworkManager.SceneManager.OnSynchronizeComplete += SceneManager_OnSynchronizeComplete; ;
+        //NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+        //NetworkManager.SceneManager.OnSynchronizeComplete += SceneManager_OnSynchronizeComplete; ;
 
     }
 

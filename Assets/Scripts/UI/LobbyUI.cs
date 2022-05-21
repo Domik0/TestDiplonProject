@@ -4,6 +4,7 @@ using Assets.Scripts.Networking;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace StarterAssets
@@ -176,7 +177,7 @@ namespace StarterAssets
             if (serverRpcParams.Receive.SenderClientId != NetworkManager.Singleton.LocalClientId) { return; }
 
             if (!IsEveryoneReady()) { return; }
-
+          
             ServerGameNetPortal.Instance.StartGame();
         }
 

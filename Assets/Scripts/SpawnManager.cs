@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using StarterAssets;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class SpawnManager : NetworkBehaviour
@@ -18,9 +19,9 @@ public class SpawnManager : NetworkBehaviour
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
     private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
 
-
     private void Start()
     {
+        
         if (IsServer && rndTag.Value == 0)
         {
             rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
@@ -35,6 +36,7 @@ public class SpawnManager : NetworkBehaviour
         SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, rndSpawnPointId);
         SpawnBonusServerRpc(rndSpawnPointId);
     }
+
 
     [ServerRpc(RequireOwnership = false)]
     private void AddConnectPlayerServerRpc()
@@ -73,7 +75,6 @@ public class SpawnManager : NetworkBehaviour
         if (loudingCount.Value == rndTag.Value)
         {
             go.GetComponent<ThirdPersonController>().isTag.Value = true;
-            go.GetComponent<ThirdPersonController>().timeTag.Value -= TimeSpan.FromSeconds(UIManager.Instance.loadingSeconds);
         }
         go.SpawnAsPlayerObject(localClientId);
     }

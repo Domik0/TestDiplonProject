@@ -320,11 +320,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.RpcHashSize
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.LoadSceneTimeOut
-      value: 5
+      value: 120
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkTransport
@@ -332,7 +332,7 @@ PrefabInstance:
       objectReference: {fileID: 212038982}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.ClientConnectionBufferTimeout
-      value: 5
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.EnsureNetworkVariableLengthSafety
