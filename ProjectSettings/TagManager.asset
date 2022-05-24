@@ -12,6 +12,7 @@ TagManager:
   - Chest
   - VirtualCamera
   - DontDestroyObjectCustom
+  - Inventory
   layers:
   - Default
   - TransparentFX

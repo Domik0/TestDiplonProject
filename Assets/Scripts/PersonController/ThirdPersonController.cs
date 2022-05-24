@@ -122,6 +122,7 @@ namespace StarterAssets
         private GameObject _mainCamera;
         private const float _threshold = 0.01f;
         private bool _hasAnimator;
+        private InventoryWindow targetInventoryWindow;
 
 
         private void Awake()
@@ -133,6 +134,9 @@ namespace StarterAssets
             _controller = GetComponent<CharacterController>();
             _animator = GetComponent<Animator>();
             _input = GetComponent<StarterAssetsInputs>();
+
+            targetInventoryWindow = GameObject.FindWithTag("Inventory").GetComponent<InventoryWindow>();
+            targetInventoryWindow.StartAddInventory(gameObject.GetComponent<Inventory>());
         }
 
         private void Start()
@@ -226,6 +230,7 @@ namespace StarterAssets
                 {
                     _animator.SetTrigger("Throw");
                 }
+                targetInventoryWindow.targetInventory.AddItem(Storage.GetStorage().GetItem("BombSlowdown"));
             }
         }
 
