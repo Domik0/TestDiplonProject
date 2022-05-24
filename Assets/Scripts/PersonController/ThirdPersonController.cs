@@ -5,7 +5,10 @@ using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
+
 namespace StarterAssets
 {
 
@@ -38,7 +41,6 @@ namespace StarterAssets
         public GameObject inventoryObject;
 
         [Header("Player Grounded")]
-        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
         [Tooltip("Useful for rough ground")]
         public float GroundedOffset = -0.14f;
@@ -59,6 +61,9 @@ namespace StarterAssets
         public bool LockCameraPosition = false;
 
         [SerializeField]
+        private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
+
+        [SerializeField]
         private float minPucnhDistance = 1.0f;
         [SerializeField]
         private GameObject hand;
@@ -66,6 +71,10 @@ namespace StarterAssets
         [Header("Network")]
         [SerializeField]
         private NetworkVariable<float> networkAnimationBlend = new NetworkVariable<float>();
+        [SerializeField]
+        private NetworkVariable<Vector3> networkMotion = new NetworkVariable<Vector3>();
+        [SerializeField]
+        private NetworkVariable<Quaternion> networkRotation = new NetworkVariable<Quaternion>();
         [SerializeField]
         private NetworkVariable<int> networkDanceId = new NetworkVariable<int>();
         [SerializeField]
@@ -76,23 +85,25 @@ namespace StarterAssets
         private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
         [SerializeField]
         private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
-        [SerializeField] 
+
+        [SerializeField]
         public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
         [SerializeField]
         public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
-        
+
         [SerializeField]
         public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
 
 
         // client caches positions
-        private PlayerState _oldPlayerState = PlayerState.Move;
+        private PlayerState _oldPlayerState = PlayerState.Idle;
         private int _oldDanceId;
         private float _oldAnimationBlend;
         private bool _oldGround;
         private bool _oldAnimJump;
         private bool _oldAnimFall;
         private bool _oldTag;
+        private Vector3 _oldMotion;
 
         // player
         private float _speed;
@@ -111,10 +122,8 @@ namespace StarterAssets
         private float _danceTimeoutDelta;
         private float _punchTimeoutDelta;
 
-       
 
-
-        private Animator _animator;
+        private NetworkAnimator _animator;
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
@@ -129,7 +138,7 @@ namespace StarterAssets
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
             _controller = GetComponent<CharacterController>();
-            _animator = GetComponent<Animator>();
+            _animator = GetComponent<NetworkAnimator>();
             _input = GetComponent<StarterAssetsInputs>();
         }
 
@@ -139,32 +148,33 @@ namespace StarterAssets
             if (IsClient && IsOwner)
             {
                 PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
-                _animator = GetComponent<Animator>();
                 _hasAnimator = TryGetComponent(out _animator);
                 UICanvasControllerInput.Instance.FollowPlayer(_input);
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
-              
+                transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
+                    Random.Range(1,2));
             }
 
         }
 
-      
+
 
         private void Update()
         {
+             
             if (IsClient && IsOwner)
             {
                 GroundedCheck();
                 JumpAndGravity();
-                ClientMove();
-                Dance();
-                Beating();
-                Throwing();
-                TimeTagChange();
-            }
-
-            ClientVisuals();
+                Move();
+                // Dance();
+                // Beating();
+                // Throwing();
+                //  TimeTagChange();
+            } 
+           // ClientMotion();
+           ClientVisuals();
         }
 
         private void TimeTagChange()
@@ -181,7 +191,10 @@ namespace StarterAssets
             timeTag.Value += TimeSpan.FromSeconds(Time.deltaTime);
         }
 
-
+        // private void ClientMotion()
+        //{
+        //    _controller.Move(networkMotion.Value);
+        //}
 
         private void LateUpdate()
         {
@@ -189,6 +202,7 @@ namespace StarterAssets
             {
                 CameraRotation();
             }
+
         }
 
 
@@ -231,8 +245,9 @@ namespace StarterAssets
         {
             // set sphere position, with offset
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-            bool grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-            UpdateGroundServerRpc(grounded);
+            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+            UpdateAnimationBoolServerRpc("Ground",Grounded);
+           
         }
 
         private void CameraRotation()
@@ -251,7 +266,7 @@ namespace StarterAssets
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride, _cinemachineTargetYaw, 0.0f);
         }
 
-        private void ClientMove()
+        private void Move()
         {
             // set target speed based on move speed, sprint speed and if sprint is pressed
             bool isSprint = CheckSprint();
@@ -264,6 +279,7 @@ namespace StarterAssets
             float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
             float speedOffset = 0.1f;
             float inputMagnitude = 1f;
+            //float rotation=default;
             // accelerate or decelerate to target speed
             if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
             {
@@ -279,7 +295,7 @@ namespace StarterAssets
             }
 
             _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-
+          
             // normalise input direction
             Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
 
@@ -288,131 +304,181 @@ namespace StarterAssets
             if (_input.move != Vector2.zero)
             {
                 _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
-                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
+                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
+                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+                 // rotate to face input direction relative to camera position
+            }
+            
+            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            
+            var motion = targetDirection.normalized * (_speed * Time.deltaTime) +
+                    new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
 
-                // rotate to face input direction relative to camera position
-                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            
+            if (!isSprint)
+            {
+                if (targetSpeed == 0)
+                {
+                    UpdatePlayerStateServerRpc(PlayerState.Idle);
+                }
+                else
+                {
+                    UpdatePlayerStateServerRpc(PlayerState.Walk);
+                }
+
+            }
+            if (isSprint)
+            {
+                UpdatePlayerStateServerRpc(PlayerState.Run);
             }
 
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+            _controller.Move(motion);
 
-            // move the player
-          ;
-            _controller.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-                //  UpdatePlayerStateServerRpc(PlayerState.Move);
-            Debug.Log("Speed"+_animationBlend);
-            UpdateAnimationBlendServerRpc(_animationBlend);
-            // update animator if using character
+            //UpdateAnimationFloatServerRpc(OwnerClientId, "Speed", _animationBlend);
+            //UpdateMotionAndAnimationBlendServerRpc(_animationBlend);
+            // Debug.Log(OwnerClientId);
+
+
         }
 
 
+        private void ClientMotion()
+        {
+            if (networkRotation.Value != Quaternion.identity)
+            {
+                transform.rotation = networkRotation.Value;
+            }
+            if (networkMotion.Value != Vector3.zero)
+            {
+                _controller.Move(networkMotion.Value);
+            }
+            
+        }
+
         private void ClientVisuals()
         {
-            if (_oldTag != isTag.Value)
-            {
-                _oldTag = isTag.Value;
-                СhangePlayerColor();
-            }
-
-            ////if (_oldPlayerState != networkPlayerState.Value)
-            ////{
-            ////    _oldPlayerState = networkPlayerState.Value;
-            ////}
-
-            //if(networkPlayerState.Value == PlayerState.Move)
+            //if (_oldTag != isTag.Value)
             //{
-            //    //if (_oldAnimationBlend != networkAnimationBlend.Value)
-            //    //{
-            //    //    _oldAnimationBlend = networkAnimationBlend.Value;
-            //    //}
-            //    //if (_oldAnimFall != animFallNetwork.Value)
-            //    //{
-            //    //    _oldAnimFall = animFallNetwork.Value;
-            //    //    //_animator.SetBool("FreeFall", animFallNetwork.Value);
-            //    //}
+            //    _oldTag = isTag.Value;
+            //    СhangePlayerColor();
+            //}
 
-            //    //if (_oldAnimJump != animJumpNetwork.Value)
-            //    //{
-            //    //    _oldAnimJump = animJumpNetwork.Value;
-            //    //    _animator.SetBool("Jump", animJumpNetwork.Value);
-            //    //}
+            if (_oldPlayerState != networkPlayerState.Value)
+            {
+                _oldPlayerState = networkPlayerState.Value;
+                _animator.SetTrigger($"{networkPlayerState.Value}");
+            }
+            //if (_oldGround != GroundNetwork.Value)
+            //{
+            //    _oldGround = GroundNetwork.Value;
+            //    _animator.Animator.SetBool("Ground", GroundNetwork.Value);
+            //}
 
-            //    //if (_oldGround != GroundNetwork.Value)
+            //if (_oldAnimFall != animFallNetwork.Value)
+            //{
+            //    _oldAnimFall = animFallNetwork.Value;
+            //    _animator.Animator.SetBool("Fall", animFallNetwork.Value);
+            //}
+
+            //if (_oldAnimJump != animJumpNetwork.Value)
+            //{
+            //    _oldAnimJump = animJumpNetwork.Value;
+            //    _animator.Animator.SetBool("Jump", animJumpNetwork.Value);
+            //}
+
+
+            //if (networkPlayerState.Value == PlayerState.Move)
+            //{
+            //    //if (!networkAnimationBlend.Value.Equals(0))
             //    //{
-            //    //    _oldGround = GroundNetwork.Value;
-            //    //    _animator.SetBool("Grounded", GroundNetwork.Value);
-            //    //}
-                
+            //    //    //_oldAnimationBlend = networkAnimationBlend.Value;
+            //    _animator.SetFloat("Speed", networkAnimationBlend.Value);
+
             //}
 
             //if (networkPlayerState.Value == PlayerState.Dance)
             //{
 
-            //    //if (_oldDanceId != networkDanceId.Value)
-            //    //{
-            //    //    _oldDanceId = networkDanceId.Value;
-            //    //    _animator.SetFloat("DanceID", networkDanceId.Value);
-            //    //    _animator.SetTrigger("Dance");
-            //    //}
-            //    //return;
+            //    if (_oldDanceId != networkDanceId.Value)
+            //    {
+            //        _oldDanceId = networkDanceId.Value;
+            //        _animator.SetFloat("DanceID", networkDanceId.Value);
+            //        _animator.SetTrigger("Dance");
+            //    }
             //}
-            //if (networkPlayerState.Value == PlayerState.Punch)
-            //{
-            //    _animator.SetTrigger("Punch");
-            //}
-
-          
         }
 
 
+        [ServerRpc]
+        private void UpdateAnimationBoolServerRpc(string animationName,bool status)
+        {
+            UpdateAnimationBoolClientRpc(animationName, status);
+        }
+
+        [ServerRpc]
+        private void UpdateAnimationFloatServerRpc(ulong ownerId, string animationName, float num)
+        {
+            //var player = NetworkManager.ConnectedClients[ownerId].PlayerObject.gameObject;
+            //if (IsClient)
+            //{
+
+            //}
+
+          //  UpdateAnimationFloatClientRpc(animationName, num);
+
+            
+
+        }
+
+        //[ClientRpc]
+        //private void UpdateAnimationFloatClientRpc(string animationName, float num,ClientRpcParams clientRpcParams=default)
+        //{
+        //    _animator.SetFloat(animationName, num);
+        //}
+
+        [ClientRpc]
+        private void UpdateAnimationBoolClientRpc(string animationName, bool status)
+        {
+            _animator.Animator.SetBool(animationName, status);
+        }
 
         [ServerRpc]
         private void UpdatePlayerStateServerRpc(PlayerState state)
         {
             networkPlayerState.Value = state;
+            
         }
 
         [ServerRpc]
-        private void UpdateDanceIdServerRpc(int danceId)
+        private void UpdateMotionAndAnimationBlendServerRpc(Vector3  motion,Quaternion rotation)
         {
-            _animator.SetTrigger("Dance");
-            _animator.SetFloat("DanceID", danceId);
-           
-        }
+          //  networkPlayerState.Value = PlayerState.Move;
+            networkMotion.Value = motion;
+            networkRotation.Value = rotation;
 
-        [ServerRpc]
-        private void UpdateAnimationBlendServerRpc(float blend)
-        {
-            networkAnimationBlend.Value = blend;
-            UpdateAnimationBlendClientRpc();
 
         }
 
-        [ClientRpc]
-        private void UpdateAnimationBlendClientRpc()
-        {
-            _animator.SetFloat("Speed", networkAnimationBlend.Value);
-        }
 
         [ServerRpc]
         private void UpdateJumpServerRpc(bool isJump)
         {
-            _animator.SetBool("Jump", isJump);
+            animJumpNetwork.Value = isJump;
+
         }
 
         [ServerRpc]
         private void UpdateFallServerRpc(bool isFall)
         {
             animFallNetwork.Value = isFall;
-            _animator.SetBool("FreeFall", isFall);
         }
 
         [ServerRpc]
         private void UpdateGroundServerRpc(bool isGround)
         {
             GroundNetwork.Value = isGround;
-            _animator.SetBool("Grounded", isGround);
         }
+
 
         [ServerRpc(RequireOwnership = false)]
         private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
@@ -434,7 +500,17 @@ namespace StarterAssets
             });
         }
 
+        private void OnDrawGizmosSelected()
+        {
+            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
+            if (GroundNetwork.Value) Gizmos.color = transparentGreen;
+            else Gizmos.color = transparentRed;
+
+            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        }
 
         private bool CheckSprint()
         {
@@ -459,19 +535,22 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (GroundNetwork.Value)
+            if (Grounded)
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
-                // update animator if using character
-                
-                    UpdateJumpServerRpc(false);
-                    UpdateFallServerRpc(false);
-                    //_animator.SetBool(_animIDJump, false);
-                    //_animator.SetBool(_animIDFreeFall, false);
+                //// update animator if using character
+                //UpdateJumpServerRpc(false);
+                //UpdateFallServerRpc(false);
 
-                    // stop our velocity dropping infinitely when grounded
+                UpdateAnimationBoolServerRpc( "Jump", false);
+                UpdateAnimationBoolServerRpc( "Fall", false);
+
+                // UpdateJumpServerRpc(false);
+                // UpdateFallServerRpc(false);
+
+                // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
                 {
                     _verticalVelocity = -2f;
@@ -481,14 +560,12 @@ namespace StarterAssets
                 if (_input.jump && _jumpTimeoutDelta <= 0.0f)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    UpdateJumpServerRpc(true);
+                    //UpdateJumpServerRpc(true);
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-
+                    //UpdateJumpServerRpc(true);
                     // update animator if using character
                     //   UpdatePlayerStateServerRpc(PlayerState.Jump);
-                       
-                        //_animator.SetBool(_animIDJump, true);
-                    
+                    UpdateAnimationBoolServerRpc( "Jump", true);
                 }
 
                 // jump timeout
@@ -510,9 +587,9 @@ namespace StarterAssets
                 else
                 {
                     // update animator if using character
-                    
-                        UpdateFallServerRpc(true);
-                        //_animator.SetBool(_animIDFreeFall, true);
+                   // UpdateFallServerRpc(true);
+                     UpdateAnimationBoolServerRpc( "Fall", true);
+                    //_animator.SetBool(_animIDFreeFall, true);
                 }
 
                 // if we are not grounded, do not jump
@@ -540,12 +617,12 @@ namespace StarterAssets
             {
                 if (GroundNetwork.Value)
                 {
-                    if ( _danceTimeoutDelta <= 0.0f)
+                    if (_danceTimeoutDelta <= 0.0f)
                     {
                         _danceTimeoutDelta = DanceTimeout;
 
-                        UpdateDanceIdServerRpc(_input.dance);
-                        UpdatePlayerStateServerRpc(PlayerState.Dance);
+                        // UpdateDanceIdServerRpc(_input.dance);
+
                     }
 
                     if (_danceTimeoutDelta >= 0.0f)
@@ -572,21 +649,21 @@ namespace StarterAssets
             switch (hit.gameObject.tag)
             {
                 case "Player":
-                {
-                    var playerHit = hit.transform.GetComponent<NetworkObject>();
-                    if (playerHit != null)
                     {
-                        if (isTag.Value)
+                        var playerHit = hit.transform.GetComponent<NetworkObject>();
+                        if (playerHit != null)
                         {
-                            UpdateTagServerRpc(true, playerHit.OwnerClientId);
-                        }
+                            if (isTag.Value)
+                            {
+                                UpdateTagServerRpc(true, playerHit.OwnerClientId);
+                            }
 
-                        //if (!isTag.Value)
-                        //{
-                        //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
-                        //}
+                            //if (!isTag.Value)
+                            //{
+                            //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                            //}
+                        }
                     }
-                }
                     break;
                 case "Trampoline":
                     JumpHeight = 2f;
@@ -617,6 +694,6 @@ namespace StarterAssets
             }
         }
 
-        
+
     }
 }

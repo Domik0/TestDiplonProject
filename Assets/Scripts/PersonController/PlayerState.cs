@@ -11,10 +11,10 @@ namespace Assets.Scripts.PersonController
         Idle,
         Walk,
         Run,
-        Move,
-        Punch,
         Jump,
-        Dance
+        Punch,
+        Ground,
+        
     } 
     
 }

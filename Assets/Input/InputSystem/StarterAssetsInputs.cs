@@ -46,11 +46,7 @@ namespace StarterAssets
             throwObject = throwObjectState;
         }
         public void ExitGame()
-        {
-            if (NetworkManager.Singleton.IsHost)
-            {
-
-            }
+        { 
             GameNetPortal.Instance.RequestDisconnect();
         }
     }

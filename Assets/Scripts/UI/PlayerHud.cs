@@ -30,11 +30,11 @@ namespace Assets.Scripts.UI
         private void Start()
         {
             
-            if (IsClient & IsOwner)
-            {
-                string nickName = PlayerPrefs.GetString("PlayerName");
-                SetNicknameServerRpc(nickName);
-            }
+            //if (IsClient & IsOwner)
+            //{
+            //    string nickName = PlayerPrefs.GetString("PlayerName");
+            //    SetNicknameServerRpc(nickName);
+            //}
            
 
         }

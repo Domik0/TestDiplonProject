@@ -27,14 +27,14 @@ public class SpawnManager : NetworkBehaviour
             rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
         }
         AddConnectPlayerServerRpc();
-        int rndSpawnPointId;
-        do
-        {
-            rndSpawnPointId = Random.Range(0, 4);
-        }
-        while (listSpawnPlayer.Contains(rndSpawnPointId));
-        SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, rndSpawnPointId);
-        SpawnBonusServerRpc(rndSpawnPointId);
+        //int rndSpawnPointId;
+        //do
+        //{
+        //    rndSpawnPointId = Random.Range(0, 4);
+        //}
+        //while (listSpawnPlayer.Contains(rndSpawnPointId));
+        SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
+            //SpawnBonusServerRpc(rndSpawnPointId);
     }
 
 
@@ -45,33 +45,11 @@ public class SpawnManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerServerRpc(ulong localClientId, int rndSpawnPointId)
+    private void SpawnPlayerServerRpc(ulong localClientId)
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
-
-        listSpawnPlayer.Add(rndSpawnPointId);
-
-        switch (rndSpawnPointId)
-        {
-            case 0:
-                spawnPos = new Vector3(0f, 0f, 0f);
-                spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                break;
-            case 1:
-                spawnPos = new Vector3(2f, 0f, 0f);
-                spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                break;
-            case 2:
-                spawnPos = new Vector3(4f, 0f, 0f);
-                spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                break;
-            case 3:
-                spawnPos = new Vector3(6f, 0f, 0f);
-                spawnRot = Quaternion.Euler(0f, 0f, 0f);
-                break;
-        }
-        var go = Instantiate(PlayerPrefab, spawnPos, spawnRot);
+        var go = Instantiate(PlayerPrefab, spawnPos, spawnRot );
         if (loudingCount.Value == rndTag.Value)
         {
             go.GetComponent<ThirdPersonController>().isTag.Value = true;
