@@ -33,6 +33,11 @@ public class SpawnManager : NetworkBehaviour
         }
         while (listSpawnPlayer.Contains(rndSpawnPointId));
         SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, rndSpawnPointId);
+        do
+        {
+            rndSpawnPointId = Random.Range(0, 5);
+        }
+        while (listSpawnChest.Contains(rndSpawnPointId));
         SpawnBonusServerRpc(rndSpawnPointId);
     }
 
@@ -84,6 +89,8 @@ public class SpawnManager : NetworkBehaviour
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
 
+        listSpawnChest.Add(rndSpawnPointId);
+
         switch (rndSpawnPointId)
         {
             case 0:
@@ -101,6 +108,10 @@ public class SpawnManager : NetworkBehaviour
             case 3:
                 spawnPos = new Vector3(18.21362f, 2.960016f, 19.52146f);
                 spawnRot = Quaternion.Euler(0f, 180f, 0f);
+                break;
+            case 4:
+                spawnPos = new Vector3(-5.485087f, 0f, -3.306727f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
                 break;
         }
         var go = Instantiate(ChestPrefab, spawnPos, spawnRot);

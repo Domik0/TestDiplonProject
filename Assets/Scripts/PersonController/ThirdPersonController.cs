@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts;
 using Assets.Scripts.Networking;
 using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
@@ -230,7 +231,6 @@ namespace StarterAssets
                 {
                     _animator.SetTrigger("Throw");
                 }
-                targetInventoryWindow.targetInventory.AddItem(Storage.GetStorage().GetItem("BombSlowdown"));
             }
         }
 
@@ -645,6 +645,12 @@ namespace StarterAssets
             }
         }
 
-        
+        void OnTriggerEnter(Collider col)
+        {
+            if (col.gameObject.tag == "Chest")
+            {
+                col.GameObject().GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
+            }
+        }
     }
 }
