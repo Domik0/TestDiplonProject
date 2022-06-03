@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Assets.Scripts
 {
@@ -17,6 +18,9 @@ namespace Assets.Scripts
 
         private Animator _animator;
         private GameObject _prefabChest;
+        private Item _itemInChest;
+        private static NetworkVariable<bool> _gaveItemPlayerFlag = new NetworkVariable<bool>();
+        private Storage _storage;
         private bool _hasAnimator;
 
         private void Start()
@@ -30,6 +34,9 @@ namespace Assets.Scripts
         private void Awake()
         {
             _animator = GetComponent<Animator>();
+            _storage = Storage.GetStorage();
+            var rndItem = Random.Range(0, _storage.AllItems.Count);
+            _itemInChest = _storage.AllItems[rndItem];
         }
 
         private void Update()
@@ -40,10 +47,14 @@ namespace Assets.Scripts
             }
         }
 
-        public void ChestOpen()
+        public void ChestOpen(InventoryWindow targetInventoryWindow)
         {
-            _animator.SetTrigger("ChestOpen");
-            //_animator.SetTrigger(_animIDChestClose);
+            if(!_gaveItemPlayerFlag.Value)
+            {
+                _animator.SetTrigger("ChestOpen");
+                targetInventoryWindow.targetInventory.AddItem(_storage.GetItem(_itemInChest.title));
+                _gaveItemPlayerFlag.Value = true;
+            }
         }
     }
 }

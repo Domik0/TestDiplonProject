@@ -1040,6 +1040,7 @@ GameObject:
   - component: {fileID: 5287089691064055494}
   - component: {fileID: 4230983722378465739}
   - component: {fileID: 2505238980888960394}
+  - component: {fileID: 7504008969833729910}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1277,6 +1278,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCameraTransform: {fileID: 0}
   billbord: {fileID: 8620372693091276847}
+--- !u!114 &7504008969833729910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416926081852918481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257f9acb7e7743544a325c0a7111f1cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartItems:
+  - {fileID: 11400000, guid: f6d1aee0c7b65ab4a9c494233948573e, type: 2}
+  - {fileID: 11400000, guid: 863f82493918bc242a47e14bc4c5b16a, type: 2}
 --- !u!1 &4523139366846529165
 GameObject:
   m_ObjectHideFlags: 0
