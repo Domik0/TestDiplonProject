@@ -12,20 +12,23 @@ using UnityEngine.UI;
 
 public class UIManager : NetworkSingleton<UIManager>
 {
-    private bool timerActive = true;
+    public NetworkVariable<bool> timerActive=new NetworkVariable<bool>();
     private NetworkVariable<TimeSpan> currentTime = new NetworkVariable<TimeSpan>();
     private NetworkVariable<TimeSpan> startTime = new NetworkVariable<TimeSpan>();
     public int startMinutes;
-    public int loadingSeconds;
     public TextMeshProUGUI currentTimeText;
-    public GameObject LoadindScene;
     public GameObject Buttons;
 
-    void Start()
+    void Awake()
     {
-        if (IsServer)
+        NetworkManager.SceneManager.OnLoadComplete += SceneManager_OnLoadComplete;
+    }
+
+    private void SceneManager_OnLoadComplete(ulong clientId, string sceneName, LoadSceneMode loadSceneMode)
+    {
+        if (sceneName == "Scene_Main")
         {
-            UpdateCurentTimeServerRpc();
+            StartTimeServerRpc();
         }
     }
 
@@ -33,48 +36,60 @@ public class UIManager : NetworkSingleton<UIManager>
     {
         if (IsServer)
         {
-            if (timerActive)
+            if (timerActive.Value)
             {
                 UpdateTimeGameServerRpc();
                 if (currentTime.Value <= TimeSpan.Zero)
                 {
-                    timerActive = false;
-                    NetworkManager.Singleton.SceneManager.LoadScene("Scene_EndGame", LoadSceneMode.Single);
+                    StopTimeServerRpc();
+                    SceneLoaderWrapper.Instance.LoadScene("Scene_EndGame", true);
                 }
             }
         }
-
-        if (startTime.Value >= TimeSpan.FromSeconds(loadingSeconds))
-        {
-            LoadindScene.SetActive(false);
-            Buttons.SetActive(true);
-        }
-        
         currentTimeText.text = currentTime.Value.ToString(@"mm\:ss");
+      
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     void UpdateTimeGameServerRpc()
     {
         currentTime.Value -= TimeSpan.FromSeconds(Time.deltaTime);
         startTime.Value += TimeSpan.FromSeconds(Time.deltaTime);
     }
 
-    [ServerRpc]
-    void UpdateCurentTimeServerRpc()
+    [ServerRpc(RequireOwnership = false)]
+    void StartTimeServerRpc()
     {
-        currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60 + loadingSeconds);
+        timerActive.Value = true;
+        currentTime.Value = TimeSpan.FromSeconds(startMinutes * 60);
         startTime.Value = TimeSpan.Zero;
+        Buttons.SetActive(true);
     }
 
 
-    public void StartTimer()
+    [ServerRpc(RequireOwnership = false)]
+    public void StopTimeServerRpc()
     {
-        timerActive = true;
+        timerActive.Value = false;
     }
 
-    public void StopTimer()
+
+    public void ExitGame()
     {
-        timerActive = false;
+        if (IsServer)
+        {
+            var player = NetworkManager.SpawnManager.GetPlayerNetworkObject(NetworkManager.LocalClientId)
+                .GetComponent<ThirdPersonController>().isTag;
+            if (player.Value)
+            {
+                player.Value = false;
+            }
+            StopTimeServerRpc();
+            SceneLoaderWrapper.Instance.LoadScene("Scene_EndGame", true);
+        }
+        else
+        {
+            GameNetPortal.Instance.RequestDisconnect();
+        }
     }
 }

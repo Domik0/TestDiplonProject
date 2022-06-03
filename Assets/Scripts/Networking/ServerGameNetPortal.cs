@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Assets.Scripts.Networking;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,7 +21,7 @@ namespace StarterAssets
         private Dictionary<ulong, string> clientIdToGuid;
         private Dictionary<ulong, int> clientSceneMap;
         private bool gameInProgress;
-        
+
         private const int MaxConnectionPayload = 1024;
 
         private GameNetPortal gameNetPortal;
@@ -44,7 +45,6 @@ namespace StarterAssets
 
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
-            
 
             clientData = new Dictionary<string, PlayerData>();
             clientIdToGuid = new Dictionary<ulong, string>();
@@ -87,15 +87,14 @@ namespace StarterAssets
         public void StartGame()
         {
             gameInProgress = true;
-
-            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Main", LoadSceneMode.Single);
+            SceneLoaderWrapper.Instance.LoadScene("Scene_Main", true);
+            //  NetworkManager.Singleton.SceneManager.LoadScene("Scene_Main", LoadSceneMode.Single);
         }
 
         public void EndRound()
         {
             gameInProgress = false;
-
-            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Lobby", LoadSceneMode.Single);
+            SceneLoaderWrapper.Instance.LoadScene("Scene_Lobby", true);
         }
 
         private void HandleNetworkReadied()
@@ -105,8 +104,8 @@ namespace StarterAssets
             gameNetPortal.OnUserDisconnectRequested += HandleUserDisconnectRequested;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
             gameNetPortal.OnClientSceneChanged += HandleClientSceneChanged;
-
-            NetworkManager.Singleton.SceneManager.LoadScene("Scene_Lobby", LoadSceneMode.Single);
+            SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
+            SceneLoaderWrapper.Instance.LoadScene("Scene_Lobby", true);
 
             if (NetworkManager.Singleton.IsHost)
             {

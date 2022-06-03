@@ -4,6 +4,7 @@ using Assets.Scripts.Networking;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace StarterAssets
@@ -16,7 +17,7 @@ namespace StarterAssets
     {
         [Header("References")]
         [SerializeField] private LobbyPlayerCard[] lobbyPlayerCards;
-        [SerializeField] private GameObject errorPanel;
+        [SerializeField] private GameObject loadScreen;
         [SerializeField] private Button startGameButton;
         [SerializeField] private TextMeshProUGUI joinCodeTextMeshProUgui;
         [SerializeField] private NetworkVariable<bool> hostExists;
@@ -174,10 +175,10 @@ namespace StarterAssets
         private void StartGameServerRpc(ServerRpcParams serverRpcParams = default)
         {
             if (serverRpcParams.Receive.SenderClientId != NetworkManager.Singleton.LocalClientId) { return; }
-
             if (!IsEveryoneReady()) { return; }
-
+            loadScreen.SetActive(true);
             ServerGameNetPortal.Instance.StartGame();
+           
         }
 
         public void OnLeaveClicked()
@@ -203,6 +204,8 @@ namespace StarterAssets
 
         public void OnStartGameClicked()
         {
+            if (!IsEveryoneReady()) { return; }
+            
             StartGameServerRpc();
         }
 

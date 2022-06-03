@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Assets.Scripts.Networking;
 using Cinemachine;
+using StarterAssets;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
@@ -29,13 +30,14 @@ namespace Assets.Scripts.UI
 
         private void Start()
         {
-            
+
             if (IsClient & IsOwner)
             {
-                string nickName = PlayerPrefs.GetString("PlayerName");
-                SetNicknameServerRpc(nickName);
+                
+                var x = gameObject.GetComponent<ThirdPersonController>().nickName.Value;
+                SetNicknameServerRpc(x);
             }
-           
+
 
         }
 
@@ -50,7 +52,7 @@ namespace Assets.Scripts.UI
         public void SetOverlay()
         {
             var localPlayerOverlay = gameObject.GetComponentInChildren<TextMeshProUGUI>();
-            localPlayerOverlay.text = playerNetworkName.Value;
+            localPlayerOverlay.text =playerNetworkName.Value;
             
         }
 
