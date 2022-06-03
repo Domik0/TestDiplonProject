@@ -1,5 +1,5 @@
 {
-    "name": "StarterAssets",
+    "name": "PlayerControlAsset",
     "maps": [
         {
             "name": "Player",
@@ -11,7 +11,8 @@
                     "id": "6bc1aaf4-b110-4ff7-891e-5b9fe6f32c4d",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Look",
@@ -19,7 +20,8 @@
                     "id": "2690c379-f54d-45be-a724-414123833eb4",
                     "expectedControlType": "Vector2",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": true
                 },
                 {
                     "name": "Jump",
@@ -27,15 +29,35 @@
                     "id": "8c4abdf8-4099-493a-aa1a-129acec7c3df",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
                 },
                 {
-                    "name": "Sprint",
-                    "type": "PassThrough",
-                    "id": "980e881e-182c-404c-8cbf-3d09fdb48fef",
-                    "expectedControlType": "",
+                    "name": "Dance",
+                    "type": "Button",
+                    "id": "e9a44c56-14e7-4334-a6e5-4e314a03887b",
+                    "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": ""
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Throw",
+                    "type": "Button",
+                    "id": "da58904e-2541-4405-9e59-669e5ee9b669",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Punch",
+                    "type": "Button",
+                    "id": "f8ba0f32-a46f-4aa7-a8f0-b3925ae49348",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -195,23 +217,34 @@
                 },
                 {
                     "name": "",
-                    "id": "dc65b89f-9bd3-43fb-92af-d0d87ba5faa4",
-                    "path": "<Keyboard>/leftShift",
+                    "id": "0d454754-17b7-47b2-a8cf-ece6f4239401",
+                    "path": "<Gamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
-                    "groups": "KeyboardMouse",
-                    "action": "Sprint",
+                    "groups": "",
+                    "action": "Dance",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "c8fcd86e-dcfd-4f88-8e93-b638cdbf3320",
-                    "path": "<Gamepad>/leftTrigger",
+                    "id": "6a525e7c-d2bf-42b4-9d19-c0eaaaa4f7f7",
+                    "path": "<Gamepad>/buttonNorth",
                     "interactions": "",
                     "processors": "",
-                    "groups": "Gamepad",
-                    "action": "Sprint",
+                    "groups": "",
+                    "action": "Throw",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ea6d09d4-f1ad-4033-a206-bf79be3f2ba5",
+                    "path": "<Gamepad>/buttonWest",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Punch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

@@ -885,7 +885,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1533643268543881147, guid: 4f6455c8a6d6e2840adabe89757f2753, type: 3}
       propertyPath: m_BlocksRaycasts
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1533643268543881147, guid: 4f6455c8a6d6e2840adabe89757f2753, type: 3}
+      propertyPath: m_IgnoreParentGroups
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4f6455c8a6d6e2840adabe89757f2753, type: 3}

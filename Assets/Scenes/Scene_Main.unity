@@ -13181,9 +13181,7 @@ MonoBehaviour:
   timerActive:
     m_InternalValue: 0
   startMinutes: 1
-  loadingSeconds: 0
   currentTimeText: {fileID: 1489409183}
-  LoadindScene: {fileID: 1489409185}
   Buttons: {fileID: 1489409184}
 --- !u!4 &1016743992 stripped
 Transform:
@@ -19149,17 +19147,21 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 3.6085205
       objectReference: {fileID: 0}
+    - target: {fileID: 3494418962008154300, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+      propertyPath: m_ControlPath
+      value: <Gamepad>/buttonWest
+      objectReference: {fileID: 0}
     - target: {fileID: 3659074485186616727, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
       propertyPath: buttonStateOutputEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1489409186}
+      objectReference: {fileID: 1016659072}
     - target: {fileID: 3659074485186616727, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
       propertyPath: buttonStateOutputEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: VirtualExit
+      value: ExitGame
       objectReference: {fileID: 0}
     - target: {fileID: 3659074485186616727, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
       propertyPath: buttonStateOutputEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: StarterAssets.UICanvasControllerInput, Assembly-CSharp
+      value: UIManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 3659074485186616727, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
       propertyPath: buttonStateOutputEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
@@ -19373,7 +19375,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1794687941339697108, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+    - {fileID: 7172654856545459790, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+    - {fileID: 5141204345575197922, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+    - {fileID: 2671343091271725749, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
 --- !u!114 &1489409183 stripped
 MonoBehaviour:
@@ -19393,20 +19399,42 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1489409185 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 8267243861699031397, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+  m_CorrespondingSourceObject: {fileID: 6212851966270525438, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
   m_PrefabInstance: {fileID: 1489409182}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &1489409186 stripped
+--- !u!1 &1489409186 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7366998336211166847, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
+  m_PrefabInstance: {fileID: 1489409182}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1489409187
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1794687941339697108, guid: 2f7f3dde7ae722a4aafffe20691ad702, type: 3}
-  m_PrefabInstance: {fileID: 1489409182}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1489409185}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a300d010f57451488aa99000126fbd5, type: 3}
+  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_MovementRange: 50
+  m_ControlPath: <Gamepad>/rightStick
+--- !u!114 &1489409188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1489409186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9d677f1681015749b15c436eec6d880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_MovementRange: 100
+  m_ControlPath: <Gamepad>/leftStick
 --- !u!1001 &1490891619
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -28287,6 +28315,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerPrefab: {fileID: 5287089691064055494, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
   ChestPrefab: {fileID: 8690602228867113167, guid: e6fd1715965d63043a413dea8f583622, type: 3}
+  defaultInitialPositionOnPlane: {x: -4, y: 4}
 --- !u!1001 &2136662770
 PrefabInstance:
   m_ObjectHideFlags: 0

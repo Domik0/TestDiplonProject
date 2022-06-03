@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Assets.Scripts;
 using StarterAssets;
 using Unity.Netcode;
 using UnityEngine;
@@ -12,29 +14,44 @@ public class SpawnManager : NetworkBehaviour
     [SerializeField] NetworkObject PlayerPrefab;
     [SerializeField] NetworkObject ChestPrefab;
 
+    [SerializeField]
+    private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
+
     private NetworkList<int> listSpawnPlayer = new NetworkList<int>();
     private List<int> listSpawnChest = new List<int>();
     private static NetworkVariable<bool> isTagSpawned = new NetworkVariable<bool>();
-
+    private NetworkList<LobbyPlayerState> listNickname=new NetworkList<LobbyPlayerState>();
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
     private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
 
     private void Start()
     {
         
-        if (IsServer && rndTag.Value == 0)
+        if (IsServer)
         {
-            rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
+            if( rndTag.Value == 0)
+            {
+                rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
+            }
+            foreach (var item in ServerGameNetPortal.Instance.clientData.Values)
+            {
+                listNickname.Add(new LobbyPlayerState()
+                {
+                    ClientId = item.ClientId,
+                    PlayerName = item.PlayerName
+                });
+            }
         }
         AddConnectPlayerServerRpc();
-        //int rndSpawnPointId;
-        //do
-        //{
-        //    rndSpawnPointId = Random.Range(0, 4);
-        //}
-        //while (listSpawnPlayer.Contains(rndSpawnPointId));
-        SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId);
-            //SpawnBonusServerRpc(rndSpawnPointId);
+        foreach (var item in listNickname)
+        {
+            if (item.ClientId == NetworkManager.LocalClientId)
+            {
+                SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, item.PlayerName.Value);
+                break;
+            }
+        }
+        //SpawnBonusServerRpc(rndSpawnPointId);
     }
 
 
@@ -45,14 +62,17 @@ public class SpawnManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerServerRpc(ulong localClientId)
+    private void SpawnPlayerServerRpc(ulong localClientId,string nick)
     {
-        Vector3 spawnPos = Vector3.zero;
-        Quaternion spawnRot = Quaternion.identity;
-        var go = Instantiate(PlayerPrefab, spawnPos, spawnRot );
+        Vector3 positon= new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
+                    Random.Range(0,1));
+        var go = Instantiate(PlayerPrefab,  positon,Quaternion.identity);
+        var controller = go.GetComponent<ThirdPersonController>();
+        controller.nickName.Value = nick;
         if (loudingCount.Value == rndTag.Value)
         {
-            go.GetComponent<ThirdPersonController>().isTag.Value = true;
+            controller.isTag.Value = true;
+
         }
         go.SpawnAsPlayerObject(localClientId);
     }

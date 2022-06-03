@@ -34,12 +34,11 @@ namespace Assets.Scripts.UI
                     personsList.Add(person.Value.PlayerObject.GetComponent<ThirdPersonController>());
                 }
 
-                personsList.OrderByDescending(p => p.timeTag.Value);
+                personsList=  personsList.OrderBy(p => p.timeTag.Value).ToList();
                 for (int i = 0; i < personsList.Count; i++)
                 {
                     if (personsList[i] != null)
                     {
-
                         cooList.Add(new PlayerStat()
                         {
                             PlayerNum = i + 1,
@@ -73,6 +72,7 @@ namespace Assets.Scripts.UI
                 listText[i].gameObject.SetActive(true);
                 listText[i].text = $"{cooList[i].PlayerNum} {cooList[i].PlayerName.Value} {cooList[i].TimeTag.ToString(@"mm\:ss")}";
             }
+            
 
 
         }

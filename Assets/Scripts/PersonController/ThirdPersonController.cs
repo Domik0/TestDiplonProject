@@ -14,33 +14,15 @@ namespace StarterAssets
 
     public class ThirdPersonController : NetworkBehaviour
     {
-        [Header("Player")]
+        private float _terminalVelocity = 53.0f;
+
+
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
         [Tooltip("Sprint speed of the character in m/s")]
         public float SprintSpeed = 5.335f;
-        [Tooltip("How fast the character turns to face movement direction")]
-        [Range(0.0f, 0.3f)]
-        public float RotationSmoothTime = 0.12f;
-        [Tooltip("Acceleration and deceleration")]
-        public float SpeedChangeRate = 10.0f;
-        public Renderer myObject;
-        [Space(10)]
-        [Tooltip("The height the player can jump")]
-        public float JumpHeight = 1.2f;
-        [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
-        public float Gravity = -15.0f;
-        [Space(10)]
-        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-        public float JumpTimeout = 0.50f;
-        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-        public float FallTimeout = 0.15f;
-        [Tooltip("Time required to perform the dance")]
-        public float DanceTimeout = 0.30f;
-        public float PunchTimeout = 0.1f;
-        public GameObject inventoryObject;
-
         [Header("Player Grounded")]
+        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
         [Tooltip("Useful for rough ground")]
         public float GroundedOffset = -0.14f;
@@ -48,133 +30,195 @@ namespace StarterAssets
         public float GroundedRadius = 0.28f;
         [Tooltip("What layers the character uses as ground")]
         public LayerMask GroundLayers;
-        [Header("Cinemachine")]
-        [Tooltip("The follow target set in the Cinemachine Virtual Camera that the camera will follow")]
-        public GameObject CinemachineCameraTarget;
-        [Tooltip("How far in degrees can you move the camera up")]
+        public Renderer myObject;
+        [SerializeField]
+        private float rotationSpeed = 3.5f;
+
+        [SerializeField]
+        private float _targetRotation = 0.0f;
+
+        private float _rotationVelocity;
+        private float _jumpTimeoutDelta;
+        private float _fallTimeoutDelta;
+
+        public float RotationSmoothTime = 0.12f;
+
+    
+        private float _verticalVelocity;
+        private float _speed;
         public float TopClamp = 70.0f;
+        public float JumpHeight = 1.2f;
+
         [Tooltip("How far in degrees can you move the camera down")]
         public float BottomClamp = -30.0f;
+        [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
+        public float Gravity = -15.0f;
         [Tooltip("Additional degress to override the camera. Useful for fine tuning camera position when locked")]
         public float CameraAngleOverride = 0.0f;
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
+        public GameObject CinemachineCameraTarget;
+        [Tooltip("Time required to perform the dance")]
+        public float DanceTimeout = 0.2f;
+        public float PunchTimeout = 0.1f;
+        [SerializeField]
+        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
+        [SerializeField]
+        public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
+        [Space(10)]
+        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
+        public float JumpTimeout = 0.50f;
+        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
+        public float FallTimeout = 0.15f;
 
-        [SerializeField]
-        private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
+        public float SpeedChangeRate = 10.0f;
+        private const float _threshold = 0.01f;
+        private float _cinemachineTargetYaw;
+        private float _cinemachineTargetPitch;
+        private int _danceId;
+        private GameObject _mainCamera;
+        private bool _oldTag;
 
-        [SerializeField]
-        private float minPucnhDistance = 1.0f;
-        [SerializeField]
-        private GameObject hand;
-
-        [Header("Network")]
-        [SerializeField]
-        private NetworkVariable<float> networkAnimationBlend = new NetworkVariable<float>();
-        [SerializeField]
-        private NetworkVariable<Vector3> networkMotion = new NetworkVariable<Vector3>();
-        [SerializeField]
-        private NetworkVariable<Quaternion> networkRotation = new NetworkVariable<Quaternion>();
-        [SerializeField]
-        private NetworkVariable<int> networkDanceId = new NetworkVariable<int>();
-        [SerializeField]
-        private NetworkVariable<PlayerState> networkPlayerState = new NetworkVariable<PlayerState>();
-        [SerializeField]
-        private NetworkVariable<bool> GroundNetwork = new NetworkVariable<bool>();
-        [SerializeField]
-        private NetworkVariable<bool> animJumpNetwork = new NetworkVariable<bool>();
-        [SerializeField]
-        private NetworkVariable<bool> animFallNetwork = new NetworkVariable<bool>();
+        private float _animationBlend;
+        private bool isJump;
+        private bool isDance;
 
         [SerializeField]
         public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
-        [SerializeField]
-        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
 
-        [SerializeField]
-        public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
+        private PlayerControlAsset playerInput;
+        private CharacterController playerController;
+        private Animator animator;
 
+        private Vector2 currentMovementInput;
+        private double _danceTimeoutDelta;
+        private double _punchTimeoutDelta;
+        private bool isPunch;
 
-        // client caches positions
-        private PlayerState _oldPlayerState = PlayerState.Idle;
-        private int _oldDanceId;
-        private float _oldAnimationBlend;
-        private bool _oldGround;
-        private bool _oldAnimJump;
-        private bool _oldAnimFall;
-        private bool _oldTag;
-        private Vector3 _oldMotion;
-
-        // player
-        private float _speed;
-        private float _animationBlend;
-        private float _targetRotation = 0.0f;
-        private float _rotationVelocity;
-        private float _verticalVelocity;
-        private float _terminalVelocity = 53.0f;
-        private float _cinemachineTargetYaw;
-        private float _cinemachineTargetPitch;
-        private float _throwPower = 4f;
-
-        // timeout deltatime
-        private float _jumpTimeoutDelta;
-        private float _fallTimeoutDelta;
-        private float _danceTimeoutDelta;
-        private float _punchTimeoutDelta;
-
-
-        private NetworkAnimator _animator;
-        private CharacterController _controller;
-        private StarterAssetsInputs _input;
-        private GameObject _mainCamera;
-        private const float _threshold = 0.01f;
-        private bool _hasAnimator;
-
-
-        private void Awake()
+        void Awake()
         {
             if (_mainCamera == null)
             {
                 _mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
             }
-            _controller = GetComponent<CharacterController>();
-            _animator = GetComponent<NetworkAnimator>();
-            _input = GetComponent<StarterAssetsInputs>();
+            playerInput = new PlayerControlAsset();
+            playerController = GetComponent<CharacterController>();
+            animator = GetComponent<Animator>();
+            playerInput.Player.Move.started += Move_input;
+            playerInput.Player.Move.canceled += Move_input;
+            playerInput.Player.Move.performed += Move_input;
+            playerInput.Player.Jump.started += OnJump;
+            playerInput.Player.Jump.canceled += OnJump;
+            playerInput.Player.Dance.started += OnDance;
+            playerInput.Player.Dance.performed += OnDance;
+            playerInput.Player.Dance.canceled += OnDance;
+            playerInput.Player.Punch.started += OnPunch;
+            playerInput.Player.Punch.performed += OnPunch;
+            playerInput.Player.Punch.canceled += OnPunch;
+
+
+
+
         }
 
-        private void Start()
+        private void OnPunch(InputAction.CallbackContext obj)
         {
+            isPunch = obj.ReadValueAsButton();
+        }
 
-            if (IsClient && IsOwner)
+      
+        private void OnDance(InputAction.CallbackContext obj)
+        {
+            isDance = obj.ReadValueAsButton();
+        }
+
+        private void OnJump(InputAction.CallbackContext obj)
+        {
+            isJump = obj.ReadValueAsButton();
+        }
+
+        private void Move_input(InputAction.CallbackContext obj)
+        {
+            Debug.Log(obj.ReadValue<Vector2>());
+            currentMovementInput = obj.ReadValue<Vector2>();
+            
+        }
+
+        private void Move()
+        {
+            bool isSprint = CheckSprint(currentMovementInput);
+            float targetSpeed = isSprint ? SprintSpeed : MoveSpeed;
+            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
+            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // if there is no input, set the target speed to 0
+            if (currentMovementInput == Vector2.zero) targetSpeed = 0.0f;
+            // a reference to the players current horizontal velocity
+            float currentHorizontalSpeed = new Vector3(playerController.velocity.x, 0.0f, playerController.velocity.z).magnitude;
+            float speedOffset = 0.1f;
+            float inputMagnitude = 1f;
+            // accelerate or decelerate to target speed
+            if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
             {
-                PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
-                _hasAnimator = TryGetComponent(out _animator);
-                UICanvasControllerInput.Instance.FollowPlayer(_input);
-                _jumpTimeoutDelta = JumpTimeout;
-                _fallTimeoutDelta = FallTimeout;
-                transform.position = new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
-                    Random.Range(1,2));
+                // creates curved result rather than a linear one giving a more organic speed change
+                // note T in Lerp is clamped, so we don't need to clamp our speed
+                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
+                // round speed to 3 decimal places
+                _speed = Mathf.Round(_speed * 1000f) / 1000f;
+            }
+            else
+            {
+                _speed = targetSpeed;
             }
 
-        }
+            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
 
+            // normalise input direction
+            Vector3 inputDirection = new Vector3(currentMovementInput.x, 0.0f, currentMovementInput.y).normalized;
 
-
-        private void Update()
-        {
-             
-            if (IsClient && IsOwner)
+            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
+            // if there is a move input rotate player when the player is moving
+            if (currentMovementInput != Vector2.zero)
             {
-                GroundedCheck();
-                JumpAndGravity();
-                Move();
-                // Dance();
-                // Beating();
-                // Throwing();
-                //  TimeTagChange();
-            } 
-           // ClientMotion();
-           ClientVisuals();
+                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
+                float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
+
+                // rotate to face input direction relative to camera position
+                transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
+            }
+
+            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
+
+            // move the player
+            playerController.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+            
+            if (currentMovementInput == Vector2.zero)
+            {
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("Walk", false);
+                    UpdateAnimatorServerRpc("Run", false);
+                }
+
+                animator.SetBool("Run", false);
+                animator.SetBool("Walk", false);
+            }
+            else if (isSprint)
+            {
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("Run", true);
+                }
+                animator.SetBool("Run", true);
+            }
+            else if (!isSprint)
+            {
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("Walk", true);
+                }
+                animator.SetBool("Walk", true);
+            }
+
         }
 
         private void TimeTagChange()
@@ -191,29 +235,125 @@ namespace StarterAssets
             timeTag.Value += TimeSpan.FromSeconds(Time.deltaTime);
         }
 
-        // private void ClientMotion()
-        //{
-        //    _controller.Move(networkMotion.Value);
-        //}
-
-        private void LateUpdate()
+        void Start()
         {
             if (IsClient && IsOwner)
             {
-                CameraRotation();
+                PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
+                _jumpTimeoutDelta = JumpTimeout;
+                _fallTimeoutDelta = FallTimeout;
+                _danceTimeoutDelta = DanceTimeout;
+                _punchTimeoutDelta = PunchTimeout;
+            }
+        }
+
+       
+        private void OnEnable()
+        {
+            playerInput.Enable();
+        }
+
+        private void OnDisable()
+        {
+            playerInput.Disable();
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            if (IsClient && IsOwner)
+            {
+                JumpAndGravity();
+                GroundCheck();
+                Move();
+                Beating();
+                Dance();
+                TimeTagChange();
             }
 
+            if (_oldTag != isTag.Value)
+            {
+                _oldTag = isTag.Value;
+                СhangePlayerColor();
+            }
         }
 
 
+        private void СhangePlayerColor()
+        {
+            if (isTag.Value == false)
+            {
+                foreach (var items in myObject.materials)
+                {
+                    items.color = Color.white;
+                }
+            }
+
+            if (isTag.Value == true)
+            {
+                foreach (var items in myObject.materials)
+                {
+                    items.color = Color.red;
+                }
+            }
+        }
+
+
+        private void Dance()
+        {
+            if (isDance)
+            {
+                if (animator.GetBool("Grounded"))
+                {
+                    if (_danceTimeoutDelta <= 0.0f)
+                    {
+                        _danceId = Random.Range(1, 7);
+                        if (!IsServer)
+                        {
+                            UpdateAnimatorServerRpc("DanceID", _danceId);
+                            UpdateAnimatorServerRpc("Dance",true);
+                        }
+                        animator.SetFloat("DanceID", _danceId);
+                        animator.SetBool("Dance", true);
+                        _danceTimeoutDelta = DanceTimeout;
+                    }
+                    if (_danceTimeoutDelta >= 0.0f)
+                    {
+                        _danceTimeoutDelta -= Time.deltaTime;
+                    }
+                }
+            }
+
+            if (isDance == false && animator.GetBool("Dance"))
+            {
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("Dance", false);
+                }
+                animator.SetBool("Dance", false);
+            }
+        }
+
         private void Beating()
         {
-            if (_input.punch)
+            if (isPunch == false)
             {
-                if (_hasAnimator && _punchTimeoutDelta <= 0.0f)
+                if (!IsServer)
                 {
-                    UpdatePlayerStateServerRpc(PlayerState.Punch);
-                    //CheckPunch(hand.transform, Vector3.down);
+                    UpdateAnimatorServerRpc("Punch", false);
+                }
+                animator.SetBool("Punch", false);
+            }
+            if (isPunch)
+            {
+                if (_punchTimeoutDelta <= 0.0f)
+                {
+
+                    if (!IsServer)
+                    {
+                        UpdateAnimatorServerRpc("Punch", true);
+                    }
+                    animator.SetBool("Punch", true);
                     _punchTimeoutDelta = PunchTimeout;
                 }
 
@@ -226,37 +366,49 @@ namespace StarterAssets
 
         private void Throwing()
         {
-            if (_input.throwObject)
+            
+        }
+
+        private void GroundCheck()
+        {
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
+            bool ground = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+            if (!IsServer)
             {
-                _animator.SetTrigger("Throw");
+                UpdateAnimatorServerRpc("Grounded", ground);
+            }
+            animator.SetBool("Grounded", ground);
+        }
+
+        void FixedUpdate()
+        {
+            if (IsClient && IsOwner)
+            {
+                CameraRotation();
             }
         }
 
-        private void ThrowObject()
+        private bool CheckSprint(Vector2 movementInput)
         {
-            var invetoryObjectRb = inventoryObject.GetComponent<Rigidbody>();
-            invetoryObjectRb.transform.parent = null;
-            invetoryObjectRb.isKinematic = false;
-            invetoryObjectRb.AddForce(transform.forward * 20, ForceMode.Impulse);
-            inventoryObject.GetComponent<Destruction>().isThrow = true;
+
+            var valueX = movementInput.x;
+            var valueY = movementInput.y;
+            if (valueX > 0.75 || valueX < -0.75 || valueY > 0.75 || valueY < -0.75)
+            {
+                return true;
+            }
+            return false;
         }
 
-        private void GroundedCheck()
-        {
-            // set sphere position, with offset
-            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
-            Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
-            UpdateAnimationBoolServerRpc("Ground",Grounded);
-           
-        }
 
         private void CameraRotation()
         {
+            var input = playerInput.Player.Look.ReadValue<Vector2>();
             // if there is an input and camera position is not fixed
-            if (_input.look.sqrMagnitude >= _threshold && !LockCameraPosition)
+            if (input.sqrMagnitude >= _threshold && !LockCameraPosition)
             {
-                _cinemachineTargetYaw += _input.look.x * Time.deltaTime;
-                _cinemachineTargetPitch += _input.look.y * Time.deltaTime;
+                _cinemachineTargetYaw += input.x * Time.deltaTime;
+                _cinemachineTargetPitch += input.y * Time.deltaTime;
             }
             // clamp our rotations so our values are limited 360 degrees
             _cinemachineTargetYaw = ClampAngle(_cinemachineTargetYaw, float.MinValue, float.MaxValue);
@@ -266,289 +418,28 @@ namespace StarterAssets
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride, _cinemachineTargetYaw, 0.0f);
         }
 
-        private void Move()
+        private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
         {
-            // set target speed based on move speed, sprint speed and if sprint is pressed
-            bool isSprint = CheckSprint();
-            float targetSpeed = isSprint ? SprintSpeed : MoveSpeed;
-            // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
-            // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is no input, set the target speed to 0
-            if (_input.move == Vector2.zero) targetSpeed = 0.0f;
-            // a reference to the players current horizontal velocity
-            float currentHorizontalSpeed = new Vector3(_controller.velocity.x, 0.0f, _controller.velocity.z).magnitude;
-            float speedOffset = 0.1f;
-            float inputMagnitude = 1f;
-            //float rotation=default;
-            // accelerate or decelerate to target speed
-            if (currentHorizontalSpeed < targetSpeed - speedOffset || currentHorizontalSpeed > targetSpeed + speedOffset)
-            {
-                // creates curved result rather than a linear one giving a more organic speed change
-                // note T in Lerp is clamped, so we don't need to clamp our speed
-                _speed = Mathf.Lerp(currentHorizontalSpeed, targetSpeed * inputMagnitude, Time.deltaTime * SpeedChangeRate);
-                // round speed to 3 decimal places
-                _speed = Mathf.Round(_speed * 1000f) / 1000f;
-            }
-            else
-            {
-                _speed = targetSpeed;
-            }
-
-            _animationBlend = Mathf.Lerp(_animationBlend, targetSpeed, Time.deltaTime * SpeedChangeRate);
-          
-            // normalise input direction
-            Vector3 inputDirection = new Vector3(_input.move.x, 0.0f, _input.move.y).normalized;
-
-            // note: Vector2's != operator uses approximation so is not floating point error prone, and is cheaper than magnitude
-            // if there is a move input rotate player when the player is moving
-            if (_input.move != Vector2.zero)
-            {
-                _targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + _mainCamera.transform.eulerAngles.y;
-                 float rotation = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetRotation, ref _rotationVelocity, RotationSmoothTime);
-                 transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
-                 // rotate to face input direction relative to camera position
-            }
-            
-            Vector3 targetDirection = Quaternion.Euler(0.0f, _targetRotation, 0.0f) * Vector3.forward;
-            
-            var motion = targetDirection.normalized * (_speed * Time.deltaTime) +
-                    new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime;
-
-            
-            if (!isSprint)
-            {
-                if (targetSpeed == 0)
-                {
-                    UpdatePlayerStateServerRpc(PlayerState.Idle);
-                }
-                else
-                {
-                    UpdatePlayerStateServerRpc(PlayerState.Walk);
-                }
-
-            }
-            if (isSprint)
-            {
-                UpdatePlayerStateServerRpc(PlayerState.Run);
-            }
-
-            _controller.Move(motion);
-
-            //UpdateAnimationFloatServerRpc(OwnerClientId, "Speed", _animationBlend);
-            //UpdateMotionAndAnimationBlendServerRpc(_animationBlend);
-            // Debug.Log(OwnerClientId);
-
-
-        }
-
-
-        private void ClientMotion()
-        {
-            if (networkRotation.Value != Quaternion.identity)
-            {
-                transform.rotation = networkRotation.Value;
-            }
-            if (networkMotion.Value != Vector3.zero)
-            {
-                _controller.Move(networkMotion.Value);
-            }
-            
-        }
-
-        private void ClientVisuals()
-        {
-            //if (_oldTag != isTag.Value)
-            //{
-            //    _oldTag = isTag.Value;
-            //    СhangePlayerColor();
-            //}
-
-            if (_oldPlayerState != networkPlayerState.Value)
-            {
-                _oldPlayerState = networkPlayerState.Value;
-                _animator.SetTrigger($"{networkPlayerState.Value}");
-            }
-            //if (_oldGround != GroundNetwork.Value)
-            //{
-            //    _oldGround = GroundNetwork.Value;
-            //    _animator.Animator.SetBool("Ground", GroundNetwork.Value);
-            //}
-
-            //if (_oldAnimFall != animFallNetwork.Value)
-            //{
-            //    _oldAnimFall = animFallNetwork.Value;
-            //    _animator.Animator.SetBool("Fall", animFallNetwork.Value);
-            //}
-
-            //if (_oldAnimJump != animJumpNetwork.Value)
-            //{
-            //    _oldAnimJump = animJumpNetwork.Value;
-            //    _animator.Animator.SetBool("Jump", animJumpNetwork.Value);
-            //}
-
-
-            //if (networkPlayerState.Value == PlayerState.Move)
-            //{
-            //    //if (!networkAnimationBlend.Value.Equals(0))
-            //    //{
-            //    //    //_oldAnimationBlend = networkAnimationBlend.Value;
-            //    _animator.SetFloat("Speed", networkAnimationBlend.Value);
-
-            //}
-
-            //if (networkPlayerState.Value == PlayerState.Dance)
-            //{
-
-            //    if (_oldDanceId != networkDanceId.Value)
-            //    {
-            //        _oldDanceId = networkDanceId.Value;
-            //        _animator.SetFloat("DanceID", networkDanceId.Value);
-            //        _animator.SetTrigger("Dance");
-            //    }
-            //}
-        }
-
-
-        [ServerRpc]
-        private void UpdateAnimationBoolServerRpc(string animationName,bool status)
-        {
-            UpdateAnimationBoolClientRpc(animationName, status);
-        }
-
-        [ServerRpc]
-        private void UpdateAnimationFloatServerRpc(ulong ownerId, string animationName, float num)
-        {
-            //var player = NetworkManager.ConnectedClients[ownerId].PlayerObject.gameObject;
-            //if (IsClient)
-            //{
-
-            //}
-
-          //  UpdateAnimationFloatClientRpc(animationName, num);
-
-            
-
-        }
-
-        //[ClientRpc]
-        //private void UpdateAnimationFloatClientRpc(string animationName, float num,ClientRpcParams clientRpcParams=default)
-        //{
-        //    _animator.SetFloat(animationName, num);
-        //}
-
-        [ClientRpc]
-        private void UpdateAnimationBoolClientRpc(string animationName, bool status)
-        {
-            _animator.Animator.SetBool(animationName, status);
-        }
-
-        [ServerRpc]
-        private void UpdatePlayerStateServerRpc(PlayerState state)
-        {
-            networkPlayerState.Value = state;
-            
-        }
-
-        [ServerRpc]
-        private void UpdateMotionAndAnimationBlendServerRpc(Vector3  motion,Quaternion rotation)
-        {
-          //  networkPlayerState.Value = PlayerState.Move;
-            networkMotion.Value = motion;
-            networkRotation.Value = rotation;
-
-
-        }
-
-
-        [ServerRpc]
-        private void UpdateJumpServerRpc(bool isJump)
-        {
-            animJumpNetwork.Value = isJump;
-
-        }
-
-        [ServerRpc]
-        private void UpdateFallServerRpc(bool isFall)
-        {
-            animFallNetwork.Value = isFall;
-        }
-
-        [ServerRpc]
-        private void UpdateGroundServerRpc(bool isGround)
-        {
-            GroundNetwork.Value = isGround;
-        }
-
-
-        [ServerRpc(RequireOwnership = false)]
-        private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
-        {
-            var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
-                .PlayerObject.GetComponent<ThirdPersonController>();
-
-            if (clientWithDamaged != null)
-            {
-                clientWithDamaged.isTag.Value = tagStatus;
-                isTag.Value = !tagStatus;
-            }
-            NotifyHealthChangedClientRpc(tagStatus, new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new ulong[] { clientId }
-                }
-            });
-        }
-
-        private void OnDrawGizmosSelected()
-        {
-            Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
-            Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
-
-            if (GroundNetwork.Value) Gizmos.color = transparentGreen;
-            else Gizmos.color = transparentRed;
-
-            // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
-        }
-
-        private bool CheckSprint()
-        {
-            var valueX = _input.move.x;
-            var valueY = _input.move.y;
-            if (valueX > 0.75 || valueX < -0.75 || valueY > 0.75 || valueY < -0.75)
-            {
-                return true;
-            }
-            return false;
-        }
-
-
-        [ClientRpc]
-        private void NotifyHealthChangedClientRpc(bool takeAwayPoint, ClientRpcParams clientRpcParams)
-        {
-            if (IsOwner) return;
-
-            Debug.Log($"Client got punch {takeAwayPoint}");
+            if (lfAngle < -360f) lfAngle += 360f;
+            if (lfAngle > 360f) lfAngle -= 360f;
+            return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
 
 
         private void JumpAndGravity()
         {
-            if (Grounded)
+            if (animator.GetBool("Grounded"))
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
-                //// update animator if using character
-                //UpdateJumpServerRpc(false);
-                //UpdateFallServerRpc(false);
-
-                UpdateAnimationBoolServerRpc( "Jump", false);
-                UpdateAnimationBoolServerRpc( "Fall", false);
-
-                // UpdateJumpServerRpc(false);
-                // UpdateFallServerRpc(false);
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("Jump", false);
+                    UpdateAnimatorServerRpc("FreeFall", false);
+                }
+                animator.SetBool("Jump", false);
+                animator.SetBool("FreeFall", false);
 
                 // stop our velocity dropping infinitely when grounded
                 if (_verticalVelocity < 0.0f)
@@ -557,15 +448,18 @@ namespace StarterAssets
                 }
 
                 // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
+                if (isJump && _jumpTimeoutDelta <= 0.0f)
                 {
                     // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    //UpdateJumpServerRpc(true);
+
                     _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-                    //UpdateJumpServerRpc(true);
+                    if (!IsServer)
+                    {
+                        UpdateAnimatorServerRpc("Jump", true);
+                    }
+                    animator.SetBool("Jump", true);
                     // update animator if using character
-                    //   UpdatePlayerStateServerRpc(PlayerState.Jump);
-                    UpdateAnimationBoolServerRpc( "Jump", true);
+
                 }
 
                 // jump timeout
@@ -586,14 +480,16 @@ namespace StarterAssets
                 }
                 else
                 {
-                    // update animator if using character
-                   // UpdateFallServerRpc(true);
-                     UpdateAnimationBoolServerRpc( "Fall", true);
-                    //_animator.SetBool(_animIDFreeFall, true);
+                    if (!IsServer)
+                    {
+                        UpdateAnimatorServerRpc("FreeFall", true);
+                    }
+                    animator.SetBool("FreeFall", true);
+                  
                 }
 
                 // if we are not grounded, do not jump
-                _input.jump = false;
+                isJump = false;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
@@ -603,71 +499,30 @@ namespace StarterAssets
             }
         }
 
-        private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
-        {
-            if (lfAngle < -360f) lfAngle += 360f;
-            if (lfAngle > 360f) lfAngle -= 360f;
-            return Mathf.Clamp(lfAngle, lfMin, lfMax);
-        }
-
-
-        private void Dance()
-        {
-            if (_input.dance > 0)
-            {
-                if (GroundNetwork.Value)
-                {
-                    if (_danceTimeoutDelta <= 0.0f)
-                    {
-                        _danceTimeoutDelta = DanceTimeout;
-
-                        // UpdateDanceIdServerRpc(_input.dance);
-
-                    }
-
-                    if (_danceTimeoutDelta >= 0.0f)
-                    {
-                        _danceTimeoutDelta -= Time.deltaTime;
-                    }
-
-                    if (_danceTimeoutDelta <= 0.0f)
-                    {
-                        _input.dance = 0;
-                    }
-                }
-                else
-                {
-                    _input.dance = 0;
-                }
-            }
-        }
-
-
-
         void OnControllerColliderHit(ControllerColliderHit hit)
         {
             switch (hit.gameObject.tag)
             {
                 case "Player":
+                {
+                    var playerHit = hit.transform.GetComponent<NetworkObject>();
+                    if (playerHit != null)
                     {
-                        var playerHit = hit.transform.GetComponent<NetworkObject>();
-                        if (playerHit != null)
+                        if (isTag.Value)
                         {
-                            if (isTag.Value)
-                            {
-                                UpdateTagServerRpc(true, playerHit.OwnerClientId);
-                            }
-
-                            //if (!isTag.Value)
-                            //{
-                            //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
-                            //}
+                            UpdateTagServerRpc(true, playerHit.OwnerClientId);
                         }
+
+                        //if (!isTag.Value)
+                        //{
+                        //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                        //}
                     }
+                }
                     break;
                 case "Trampoline":
                     JumpHeight = 2f;
-                    _input.jump = true;
+                    isJump = true;
                     break;
                 default:
                     JumpHeight = 1.2f;
@@ -675,25 +530,39 @@ namespace StarterAssets
             }
         }
 
-        private void СhangePlayerColor()
-        {
-            if (!isTag.Value)
-            {
-                foreach (var items in myObject.materials)
-                {
-                    items.color = Color.white;
-                }
-            }
 
-            if (isTag.Value)
+        [ServerRpc(RequireOwnership = false)]
+        private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
+        {
+            var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
+                .PlayerObject.GetComponent<ThirdPersonController>();
+
+            if (clientWithDamaged != null)
             {
-                foreach (var items in myObject.materials)
-                {
-                    items.color = Color.red;
-                }
+                clientWithDamaged.isTag.Value = tagStatus;
+                isTag.Value = !tagStatus;
             }
         }
 
+
+
+        [ServerRpc]
+        public void UpdateAnimatorServerRpc(string parametr)
+        {
+            animator.SetTrigger(parametr);
+        }
+
+        [ServerRpc]
+        public void UpdateAnimatorServerRpc(string parametr,float value)
+        {
+            animator.SetFloat(parametr,value);
+        }
+
+        [ServerRpc]
+        public void UpdateAnimatorServerRpc(string parametr, bool status)
+        {
+            animator.SetBool(parametr, status);
+        }
 
     }
 }
