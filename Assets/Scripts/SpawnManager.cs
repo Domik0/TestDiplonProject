@@ -51,7 +51,8 @@ public class SpawnManager : NetworkBehaviour
                 break;
             }
         }
-        //SpawnBonusServerRpc(rndSpawnPointId);
+
+        SpawnBonusServerRpc(Random.Range(1, ServerGameNetPortal.Instance.clientData.Count));
     }
 
 
@@ -100,6 +101,10 @@ public class SpawnManager : NetworkBehaviour
             case 3:
                 spawnPos = new Vector3(18.21362f, 2.960016f, 19.52146f);
                 spawnRot = Quaternion.Euler(0f, 180f, 0f);
+                break;
+            case 4:
+                spawnPos = new Vector3(-5.485087f, 0f, -3.306727f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
                 break;
         }
         var go = Instantiate(ChestPrefab, spawnPos, spawnRot);

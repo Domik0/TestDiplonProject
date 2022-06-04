@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts;
 using Assets.Scripts.Networking;
 using Assets.Scripts.PersonController;
 using Unity.VisualScripting;
@@ -89,6 +90,7 @@ namespace StarterAssets
         private PlayerControlAsset playerInput;
         private CharacterController playerController;
         private Animator animator;
+        private InventoryWindow targetInventoryWindow;
 
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
@@ -118,7 +120,8 @@ namespace StarterAssets
 
 
 
-
+            targetInventoryWindow = GameObject.FindWithTag("Inventory").GetComponent<InventoryWindow>();
+            targetInventoryWindow.StartAddInventory(gameObject.GetComponent<Inventory>());
         }
 
         private void OnPunch(InputAction.CallbackContext obj)
@@ -562,6 +565,14 @@ namespace StarterAssets
         public void UpdateAnimatorServerRpc(string parametr, bool status)
         {
             animator.SetBool(parametr, status);
+        }
+
+        void OnTriggerEnter(Collider col)
+        {
+            if (col.gameObject.tag == "Chest")
+            {
+                col.GameObject().GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
+            }
         }
 
     }

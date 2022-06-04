@@ -15,8 +15,6 @@ public class Inventory : MonoBehaviour
     void Awake()
     {
         var storage = Storage.GetStorage();
-        //AddItem(storage.GetItem("BombSlowdown"));
-        //AddItem(storage.GetItem("InvisibilityPotion"));
     }
     
     public void AddItem(Item item)
