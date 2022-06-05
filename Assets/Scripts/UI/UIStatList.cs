@@ -73,8 +73,6 @@ namespace Assets.Scripts.UI
                 listText[i].text = $"{cooList[i].PlayerNum} {cooList[i].PlayerName.Value} {cooList[i].TimeTag.ToString(@"mm\:ss")}";
             }
             
-
-
         }
 
         public void ExitClick()

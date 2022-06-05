@@ -51,10 +51,21 @@ namespace Assets.Scripts
         {
             if(!_gaveItemPlayerFlag.Value)
             {
-                _animator.SetTrigger("ChestOpen");
+                if (!IsServer)
+                {
+                    UpdateAnimatorServerRpc("ChestOpen", true);
+                }
+                _animator.SetBool("ChestOpen",true);
                 targetInventoryWindow.targetInventory.AddItem(_storage.GetItem(_itemInChest.title));
                 _gaveItemPlayerFlag.Value = true;
             }
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void UpdateAnimatorServerRpc(string parametr, bool status)
+        {
+            _animator.SetBool(parametr, status);
+        }
+
     }
 }

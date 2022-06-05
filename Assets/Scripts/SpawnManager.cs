@@ -18,7 +18,7 @@ public class SpawnManager : NetworkBehaviour
     private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
 
     private NetworkList<int> listSpawnPlayer = new NetworkList<int>();
-    private List<int> listSpawnChest = new List<int>();
+    private NetworkList<int> listSpawnChest = new NetworkList<int>();
     private static NetworkVariable<bool> isTagSpawned = new NetworkVariable<bool>();
     private NetworkList<LobbyPlayerState> listNickname=new NetworkList<LobbyPlayerState>();
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
@@ -26,7 +26,7 @@ public class SpawnManager : NetworkBehaviour
 
     private void Start()
     {
-        
+       
         if (IsServer)
         {
             if( rndTag.Value == 0)
@@ -43,6 +43,13 @@ public class SpawnManager : NetworkBehaviour
             }
         }
         AddConnectPlayerServerRpc();
+        int rndSpawnPointId;
+        do
+        {
+            rndSpawnPointId = Random.Range(0, 5);
+        }
+        while (listSpawnChest.Contains(rndSpawnPointId));
+        SpawnBonusServerRpc(Random.Range(1, rndSpawnPointId));
         foreach (var item in listNickname)
         {
             if (item.ClientId == NetworkManager.LocalClientId)
@@ -51,8 +58,7 @@ public class SpawnManager : NetworkBehaviour
                 break;
             }
         }
-
-        SpawnBonusServerRpc(Random.Range(1, ServerGameNetPortal.Instance.clientData.Count));
+       
     }
 
 
@@ -66,14 +72,13 @@ public class SpawnManager : NetworkBehaviour
     private void SpawnPlayerServerRpc(ulong localClientId,string nick)
     {
         Vector3 positon= new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
-                    Random.Range(0,1));
+                    Random.Range(-1,1));
         var go = Instantiate(PlayerPrefab,  positon,Quaternion.identity);
         var controller = go.GetComponent<ThirdPersonController>();
         controller.nickName.Value = nick;
         if (loudingCount.Value == rndTag.Value)
         {
             controller.isTag.Value = true;
-
         }
         go.SpawnAsPlayerObject(localClientId);
     }
@@ -83,7 +88,7 @@ public class SpawnManager : NetworkBehaviour
     {
         Vector3 spawnPos = Vector3.zero;
         Quaternion spawnRot = Quaternion.identity;
-
+        listSpawnChest.Add(rndSpawnPointId);
         switch (rndSpawnPointId)
         {
             case 0:
@@ -107,6 +112,7 @@ public class SpawnManager : NetworkBehaviour
                 spawnRot = Quaternion.Euler(0f, 0f, 0f);
                 break;
         }
+        
         var go = Instantiate(ChestPrefab, spawnPos, spawnRot);
         go.Spawn();
     }

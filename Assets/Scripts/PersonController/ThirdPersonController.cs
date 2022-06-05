@@ -117,11 +117,7 @@ namespace StarterAssets
             playerInput.Player.Punch.started += OnPunch;
             playerInput.Player.Punch.performed += OnPunch;
             playerInput.Player.Punch.canceled += OnPunch;
-
-
-
-            targetInventoryWindow = GameObject.FindWithTag("Inventory").GetComponent<InventoryWindow>();
-            targetInventoryWindow.StartAddInventory(gameObject.GetComponent<Inventory>());
+            
         }
 
         private void OnPunch(InputAction.CallbackContext obj)
@@ -242,11 +238,12 @@ namespace StarterAssets
         {
             if (IsClient && IsOwner)
             {
-                PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
                 _jumpTimeoutDelta = JumpTimeout;
                 _fallTimeoutDelta = FallTimeout;
                 _danceTimeoutDelta = DanceTimeout;
                 _punchTimeoutDelta = PunchTimeout;
+                PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
+                targetInventoryWindow = GameObject.FindWithTag("Inventory").GetComponent<InventoryWindow>();
             }
         }
 
@@ -509,6 +506,7 @@ namespace StarterAssets
                 case "Player":
                 {
                     var playerHit = hit.transform.GetComponent<NetworkObject>();
+                    var playerTag = hit.transform.GetComponent<ThirdPersonController>().isTag.Value;
                     if (playerHit != null)
                     {
                         if (isTag.Value)
@@ -516,10 +514,14 @@ namespace StarterAssets
                             UpdateTagServerRpc(true, playerHit.OwnerClientId);
                         }
 
-                        //if (!isTag.Value)
-                        //{
-                        //    UpdateTagServerRpc(false, playerHit.OwnerClientId);
-                        //}
+                        if (!isTag.Value)
+                        {
+                            if (playerTag)
+                            {
+                                UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                            }
+                            
+                        }
                     }
                 }
                     break;
@@ -550,12 +552,6 @@ namespace StarterAssets
 
 
         [ServerRpc]
-        public void UpdateAnimatorServerRpc(string parametr)
-        {
-            animator.SetTrigger(parametr);
-        }
-
-        [ServerRpc]
         public void UpdateAnimatorServerRpc(string parametr,float value)
         {
             animator.SetFloat(parametr,value);
@@ -571,7 +567,7 @@ namespace StarterAssets
         {
             if (col.gameObject.tag == "Chest")
             {
-                col.GameObject().GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
+                col.gameObject.GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
             }
         }
 
