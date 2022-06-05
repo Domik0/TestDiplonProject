@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Assets.Scripts;
 using Assets.Scripts.Networking;
 using Assets.Scripts.PersonController;
@@ -95,7 +96,10 @@ namespace StarterAssets
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
         private double _punchTimeoutDelta;
+        private double _throwTimeoutDelta;
         private bool isPunch;
+        private bool isThrow;
+        private Item currentBonus;
 
         void Awake()
         {
@@ -117,7 +121,10 @@ namespace StarterAssets
             playerInput.Player.Punch.started += OnPunch;
             playerInput.Player.Punch.performed += OnPunch;
             playerInput.Player.Punch.canceled += OnPunch;
-            
+            playerInput.Player.Throw.started += OnThrow;
+            playerInput.Player.Throw.performed += OnThrow;
+            playerInput.Player.Throw.canceled += OnThrow;
+
         }
 
         private void OnPunch(InputAction.CallbackContext obj)
@@ -125,7 +132,11 @@ namespace StarterAssets
             isPunch = obj.ReadValueAsButton();
         }
 
-      
+        private void OnThrow(InputAction.CallbackContext obj)
+        {
+            isThrow = obj.ReadValueAsButton();
+        }
+
         private void OnDance(InputAction.CallbackContext obj)
         {
             isDance = obj.ReadValueAsButton();
@@ -247,7 +258,6 @@ namespace StarterAssets
             }
         }
 
-       
         private void OnEnable()
         {
             playerInput.Enable();
@@ -269,6 +279,7 @@ namespace StarterAssets
                 Beating();
                 Dance();
                 TimeTagChange();
+                Throwing();
             }
 
             if (_oldTag != isTag.Value)
@@ -277,7 +288,6 @@ namespace StarterAssets
                 СhangePlayerColor();
             }
         }
-
 
         private void СhangePlayerColor()
         {
@@ -297,7 +307,6 @@ namespace StarterAssets
                 }
             }
         }
-
 
         private void Dance()
         {
@@ -366,7 +375,32 @@ namespace StarterAssets
 
         private void Throwing()
         {
-            
+            if (isThrow)
+            {
+                if (_throwTimeoutDelta <= 0.0f)
+                {
+                    switch (currentBonus.title)
+                    {
+                        case "InvisibilityPotion":
+                            myObject.enabled = true;
+                            targetInventoryWindow.targetInventory.inventoryItems.RemoveAt(0);
+                            return;
+                    }
+                    currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
+                    _throwTimeoutDelta = currentBonus.timeDurationBonus;
+                }
+
+                if (_throwTimeoutDelta >= 0.0f)
+                {
+                    switch (currentBonus.title)
+                    {
+                        case "InvisibilityPotion":
+                            myObject.enabled = false;
+                            return;
+                    }
+                    _throwTimeoutDelta -= Time.deltaTime;
+                }
+            }
         }
 
         private void GroundCheck()
@@ -390,7 +424,6 @@ namespace StarterAssets
 
         private bool CheckSprint(Vector2 movementInput)
         {
-
             var valueX = movementInput.x;
             var valueY = movementInput.y;
             if (valueX > 0.75 || valueX < -0.75 || valueY > 0.75 || valueY < -0.75)
@@ -399,7 +432,6 @@ namespace StarterAssets
             }
             return false;
         }
-
 
         private void CameraRotation()
         {
@@ -424,7 +456,6 @@ namespace StarterAssets
             if (lfAngle > 360f) lfAngle -= 360f;
             return Mathf.Clamp(lfAngle, lfMin, lfMax);
         }
-
 
         private void JumpAndGravity()
         {
@@ -535,7 +566,6 @@ namespace StarterAssets
             }
         }
 
-
         [ServerRpc(RequireOwnership = false)]
         private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
         {
@@ -548,8 +578,6 @@ namespace StarterAssets
                 isTag.Value = !tagStatus;
             }
         }
-
-
 
         [ServerRpc]
         public void UpdateAnimatorServerRpc(string parametr,float value)
