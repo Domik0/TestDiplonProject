@@ -43,6 +43,9 @@ namespace StarterAssets
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
 
+        private NetworkVariable<bool> _flagVisibility = new NetworkVariable<bool>(true);
+        private bool _flagOldVisibility = true;
+
         public float RotationSmoothTime = 0.12f;
 
     
@@ -255,6 +258,7 @@ namespace StarterAssets
                 _punchTimeoutDelta = PunchTimeout;
                 PlayerFollow.Instance.FollowPlayer(transform.Find("PlayerCameraRoot"));
                 targetInventoryWindow = GameObject.FindWithTag("Inventory").GetComponent<InventoryWindow>();
+                targetInventoryWindow.StartAddInventory(gameObject.GetComponent<Inventory>());
             }
         }
 
@@ -286,6 +290,25 @@ namespace StarterAssets
             {
                 _oldTag = isTag.Value;
                 СhangePlayerColor();
+            }
+
+            if (_flagOldVisibility != _flagVisibility.Value)
+            {
+                _flagOldVisibility = _flagVisibility.Value;
+                СhangePlayerVisibility();
+            }
+        }
+
+        private void СhangePlayerVisibility()
+        {
+            if (_flagVisibility.Value == false)
+            {
+                myObject.enabled = false;
+            }
+
+            if (_flagVisibility.Value == true)
+            {
+                myObject.enabled = true;
             }
         }
 
@@ -379,27 +402,32 @@ namespace StarterAssets
             {
                 if (_throwTimeoutDelta <= 0.0f)
                 {
-                    switch (currentBonus.title)
-                    {
-                        case "InvisibilityPotion":
-                            myObject.enabled = true;
-                            targetInventoryWindow.targetInventory.inventoryItems.RemoveAt(0);
-                            return;
-                    }
                     currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
                     _throwTimeoutDelta = currentBonus.timeDurationBonus;
                 }
+            }
 
-                if (_throwTimeoutDelta >= 0.0f)
+            if (_throwTimeoutDelta <= 0.0f && currentBonus != null)
+            {
+                switch (currentBonus.title)
                 {
-                    switch (currentBonus.title)
-                    {
-                        case "InvisibilityPotion":
-                            myObject.enabled = false;
-                            return;
-                    }
-                    _throwTimeoutDelta -= Time.deltaTime;
+                    case "InvisibilityPotion":
+                        UpdateVisibilityServerRpc(true);
+                        targetInventoryWindow.targetInventory.RemoveItemAt(0);
+                        currentBonus = null;
+                        break;
                 }
+            }
+
+            if (_throwTimeoutDelta >= 0.0f && currentBonus != null)
+            {
+                switch (currentBonus.title)
+                {
+                    case "InvisibilityPotion":
+                        UpdateVisibilityServerRpc(false);
+                        break;
+                }
+                _throwTimeoutDelta -= Time.deltaTime;
             }
         }
 
@@ -577,6 +605,12 @@ namespace StarterAssets
                 clientWithDamaged.isTag.Value = tagStatus;
                 isTag.Value = !tagStatus;
             }
+        }
+
+        [ServerRpc]
+        private void UpdateVisibilityServerRpc(bool param)
+        {
+            _flagVisibility.Value = param;
         }
 
         [ServerRpc]

@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 public class Inventory : MonoBehaviour
 {
-    public Action<Item> onItemAdded;
+    public Action onItemAddorDel;
 
     [SerializeField] private List<Item> StartItems = new List<Item>();
 
@@ -20,7 +20,14 @@ public class Inventory : MonoBehaviour
     public void AddItem(Item item)
     {
         inventoryItems.Add(item);
-        
-        onItemAdded?.Invoke(item);
+
+        onItemAddorDel?.Invoke();
+    }
+
+    public void RemoveItemAt(int index)
+    {
+        inventoryItems.RemoveAt(index);
+
+        onItemAddorDel?.Invoke();
     }
 }

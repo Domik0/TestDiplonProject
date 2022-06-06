@@ -380,6 +380,22 @@ PrefabInstance:
       propertyPath: m_MatchWidthOrHeight
       value: 0.5
       objectReference: {fileID: 0}
+    - target: {fileID: 7600295319388815752, guid: 016f9cee621c5b94fb3e4784a9df2586, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7600295319388815752, guid: 016f9cee621c5b94fb3e4784a9df2586, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7600295319388815752, guid: 016f9cee621c5b94fb3e4784a9df2586, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7600295319388815752, guid: 016f9cee621c5b94fb3e4784a9df2586, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: StarterAssets.MainMenuUI, Assembly-CSharp
+      objectReference: {fileID: 0}
     - target: {fileID: 7600295319388815753, guid: 016f9cee621c5b94fb3e4784a9df2586, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0.5

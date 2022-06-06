@@ -13,11 +13,11 @@ public class InventoryWindow : MonoBehaviour
     public void StartAddInventory(Inventory inventory)
     {
         targetInventory = inventory;
-        targetInventory.onItemAdded += OnItemAdded;
+        targetInventory.onItemAddorDel += OnItemAdded;
         Redraw();
     }
 
-    private void OnItemAdded(Item item) => Redraw();
+    private void OnItemAdded() => Redraw();
 
     void Redraw()
     {
