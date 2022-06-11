@@ -71,6 +71,7 @@ public class UIManager : NetworkSingleton<UIManager>
     public void StopTimeServerRpc()
     {
         timerActive.Value = false;
+        SpawnManager.loudingCount.Value = 0;
     }
 
 
@@ -85,6 +86,7 @@ public class UIManager : NetworkSingleton<UIManager>
                 player.Value = false;
             }
             StopTimeServerRpc();
+            
             SceneLoaderWrapper.Instance.LoadScene("Scene_EndGame", true);
         }
         else

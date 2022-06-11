@@ -34,7 +34,8 @@ namespace StarterAssets
         public LayerMask GroundLayers;
         public Renderer myObject;
         [SerializeField]
-        private float rotationSpeed = 3.5f;
+        private float rotationSpeed = 2.5f;
+
 
         [SerializeField]
         private float _targetRotation = 0.0f;
@@ -48,7 +49,7 @@ namespace StarterAssets
 
         public float RotationSmoothTime = 0.12f;
 
-    
+
         private float _verticalVelocity;
         private float _speed;
         public float TopClamp = 70.0f;
@@ -66,6 +67,7 @@ namespace StarterAssets
         [Tooltip("Time required to perform the dance")]
         public float DanceTimeout = 0.2f;
         public float PunchTimeout = 0.1f;
+        public float TagTimeout = 0.1f;
         [SerializeField]
         public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
         [SerializeField]
@@ -100,6 +102,7 @@ namespace StarterAssets
         private double _danceTimeoutDelta;
         private double _punchTimeoutDelta;
         private double _throwTimeoutDelta;
+        private double _tagTimeoutDelta;
         private bool isPunch;
         private bool isThrow;
         private Item currentBonus;
@@ -119,7 +122,6 @@ namespace StarterAssets
             playerInput.Player.Jump.started += OnJump;
             playerInput.Player.Jump.canceled += OnJump;
             playerInput.Player.Dance.started += OnDance;
-            playerInput.Player.Dance.performed += OnDance;
             playerInput.Player.Dance.canceled += OnDance;
             playerInput.Player.Punch.started += OnPunch;
             playerInput.Player.Punch.performed += OnPunch;
@@ -154,7 +156,7 @@ namespace StarterAssets
         {
             Debug.Log(obj.ReadValue<Vector2>());
             currentMovementInput = obj.ReadValue<Vector2>();
-            
+
         }
 
         private void Move()
@@ -203,7 +205,7 @@ namespace StarterAssets
 
             // move the player
             playerController.Move(targetDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
-            
+
             if (currentMovementInput == Vector2.zero)
             {
                 if (!IsServer)
@@ -333,35 +335,44 @@ namespace StarterAssets
 
         private void Dance()
         {
-            if (isDance)
+            if (Grounded)
             {
-                if (animator.GetBool("Grounded"))
+                if (_danceTimeoutDelta <= 0.0f && isDance)
                 {
-                    if (_danceTimeoutDelta <= 0.0f)
-                    {
+                        _danceTimeoutDelta = DanceTimeout;
                         _danceId = Random.Range(1, 7);
                         if (!IsServer)
                         {
                             UpdateAnimatorServerRpc("DanceID", _danceId);
-                            UpdateAnimatorServerRpc("Dance",true);
+                            UpdateAnimatorServerRpc("Dance", true);
                         }
                         animator.SetFloat("DanceID", _danceId);
                         animator.SetBool("Dance", true);
-                        _danceTimeoutDelta = DanceTimeout;
-                    }
-                    if (_danceTimeoutDelta >= 0.0f)
+                       
+
+                }
+                if (_danceTimeoutDelta >= 0.0f)
+                {
+                    _danceTimeoutDelta -= Time.deltaTime;
+                }
+
+                if (!isDance)
+                {
+                    if (!IsServer)
                     {
-                        _danceTimeoutDelta -= Time.deltaTime;
+                        UpdateAnimatorServerRpc("Dance", false);
                     }
+
+                    animator.SetBool("Dance", false);
                 }
             }
-
-            if (isDance == false && animator.GetBool("Dance"))
+            else
             {
-                if (!IsServer)
+                ; if (!IsServer)
                 {
                     UpdateAnimatorServerRpc("Dance", false);
                 }
+
                 animator.SetBool("Dance", false);
             }
         }
@@ -435,6 +446,7 @@ namespace StarterAssets
         {
             Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
             bool ground = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
+            Grounded = ground;
             if (!IsServer)
             {
                 UpdateAnimatorServerRpc("Grounded", ground);
@@ -487,7 +499,7 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
-            if (animator.GetBool("Grounded"))
+            if (Grounded)
             {
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
@@ -544,7 +556,7 @@ namespace StarterAssets
                         UpdateAnimatorServerRpc("FreeFall", true);
                     }
                     animator.SetBool("FreeFall", true);
-                  
+
                 }
 
                 // if we are not grounded, do not jump
@@ -563,26 +575,35 @@ namespace StarterAssets
             switch (hit.gameObject.tag)
             {
                 case "Player":
-                {
-                    var playerHit = hit.transform.GetComponent<NetworkObject>();
-                    var playerTag = hit.transform.GetComponent<ThirdPersonController>().isTag.Value;
-                    if (playerHit != null)
                     {
-                        if (isTag.Value)
+                        var playerHit = hit.transform.GetComponent<NetworkObject>();
+                        var playerTag = hit.transform.GetComponent<ThirdPersonController>().isTag.Value;
+                        if (playerHit != null)
                         {
-                            UpdateTagServerRpc(true, playerHit.OwnerClientId);
-                        }
-
-                        if (!isTag.Value)
-                        {
-                            if (playerTag)
+                            if (_tagTimeoutDelta <= 0)
                             {
-                                UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                                if (isTag.Value)
+                                {
+                                    UpdateTagServerRpc(true, playerHit.OwnerClientId);
+                                }
+
+                                if (!isTag.Value)
+                                {
+                                    if (playerTag)
+                                    {
+                                        UpdateTagServerRpc(false, playerHit.OwnerClientId);
+                                    }
+
+                                }
+                                _tagTimeoutDelta = TagTimeout;
                             }
-                            
+                            if (_tagTimeoutDelta >= 0)
+                            {
+                                _tagTimeoutDelta -= Time.deltaTime;
+                            }
+
                         }
                     }
-                }
                     break;
                 case "Trampoline":
                     JumpHeight = 2f;
@@ -614,9 +635,9 @@ namespace StarterAssets
         }
 
         [ServerRpc]
-        public void UpdateAnimatorServerRpc(string parametr,float value)
+        public void UpdateAnimatorServerRpc(string parametr, float value)
         {
-            animator.SetFloat(parametr,value);
+            animator.SetFloat(parametr, value);
         }
 
         [ServerRpc]

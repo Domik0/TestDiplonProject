@@ -1118,9 +1118,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushLayers:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 64
   canPush: 1
-  strength: 1.1
+  strength: 0.89
 --- !u!114 &5287089691064055494
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1209,6 +1209,7 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 8338988566280778634}
   DanceTimeout: 0.3
   PunchTimeout: 0.1
+  TagTimeout: 0.1
   isTag:
     m_InternalValue: 0
   JumpTimeout: 0.5

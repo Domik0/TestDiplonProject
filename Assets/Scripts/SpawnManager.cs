@@ -22,17 +22,14 @@ public class SpawnManager : NetworkBehaviour
     private static NetworkVariable<bool> isTagSpawned = new NetworkVariable<bool>();
     private NetworkList<LobbyPlayerState> listNickname=new NetworkList<LobbyPlayerState>();
     private static NetworkVariable<int> rndTag = new NetworkVariable<int>();
-    private static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
+    public static NetworkVariable<int> loudingCount = new NetworkVariable<int>();
 
     private void Start()
     {
        
         if (IsServer)
         {
-            if( rndTag.Value == 0)
-            {
-                rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
-            }
+            rndTag.Value = Random.Range(1, ServerGameNetPortal.Instance.clientData.Count);
             foreach (var item in ServerGameNetPortal.Instance.clientData.Values)
             {
                 listNickname.Add(new LobbyPlayerState()
@@ -61,6 +58,7 @@ public class SpawnManager : NetworkBehaviour
        
     }
 
+ 
 
     [ServerRpc(RequireOwnership = false)]
     private void AddConnectPlayerServerRpc()
@@ -72,7 +70,7 @@ public class SpawnManager : NetworkBehaviour
     private void SpawnPlayerServerRpc(ulong localClientId,string nick)
     {
         Vector3 positon= new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
-                    Random.Range(-1,1));
+                    Random.Range(0,2));
         var go = Instantiate(PlayerPrefab,  positon,Quaternion.identity);
         var controller = go.GetComponent<ThirdPersonController>();
         controller.nickName.Value = nick;
