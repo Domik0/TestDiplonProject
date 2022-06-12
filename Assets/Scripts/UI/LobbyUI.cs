@@ -58,7 +58,7 @@ namespace StarterAssets
                     HandleClientConnected(client.ClientId);
                 }
             }
-            joinCodeTextMeshProUgui.text = $"JOIN CODE: {joinCode.Value}";
+            joinCodeTextMeshProUgui.text = $"{joinCode.Value}";
         }
 
         public override void OnDestroy()

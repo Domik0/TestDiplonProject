@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 15396339da9c39343b1c9b13fb4db5b4
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Gore
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 37f78060068d26248b555eb788ad56b0, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

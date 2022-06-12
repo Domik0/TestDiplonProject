@@ -367,13 +367,13 @@ namespace StarterAssets
                 }
             }
             else
-            {
-                ; if (!IsServer)
+            { 
+                if (!IsServer)
                 {
                     UpdateAnimatorServerRpc("Dance", false);
                 }
-
                 animator.SetBool("Dance", false);
+
             }
         }
 

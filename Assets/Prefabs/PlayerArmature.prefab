@@ -1118,7 +1118,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pushLayers:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 1
   canPush: 1
   strength: 0.89
 --- !u!114 &5287089691064055494
@@ -1603,8 +1603,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: '[INFO]'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 66bada3a37cac8b4cb792037908c8609, type: 2}
-  m_sharedMaterial: {fileID: -2735389647746514628, guid: 66bada3a37cac8b4cb792037908c8609, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b075638fb02baf141a5171866783e265, type: 2}
+  m_sharedMaterial: {fileID: -8314003750520376678, guid: b075638fb02baf141a5171866783e265, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
