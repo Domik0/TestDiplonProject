@@ -15,3 +15,4 @@ MonoBehaviour:
   title: Smoke
   timeDurationBonus: 10
   image: {fileID: 21300000, guid: de737ccfe32c1b348858c17be5501320, type: 3}
+  Granade: {fileID: 8936254276041740111, guid: 9cac60b4f22396c45985cb7814abbf19, type: 3}
