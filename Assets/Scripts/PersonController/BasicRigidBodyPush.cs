@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 
 public class BasicRigidBodyPush : MonoBehaviour
 {
@@ -11,25 +12,35 @@ public class BasicRigidBodyPush : MonoBehaviour
 		if (canPush) PushRigidBodies(hit);
 	}
 
-	private void PushRigidBodies(ControllerColliderHit hit)
-	{
-		// https://docs.unity3d.com/ScriptReference/CharacterController.OnControllerColliderHit.html
 
-		// make sure we hit a non kinematic rigidbody
-		Rigidbody body = hit.collider.attachedRigidbody;
-		if (body == null || body.isKinematic) return;
+    private void PushRigidBodies(ControllerColliderHit hit)
+    {
+        // make sure we hit a non kinematic rigidbody
+        Rigidbody body = hit.collider.attachedRigidbody;
+        if (body == null || body.isKinematic) return;
 
-		// make sure we only push desired layer(s)
-		var bodyLayerMask = 1 << body.gameObject.layer;
-		if ((bodyLayerMask & pushLayers.value) == 0) return;
+        // make sure we only push desired layer(s)
+        var bodyLayerMask = 1 << body.gameObject.layer;
+        if ((bodyLayerMask & pushLayers.value) == 0) return;
 
-		// We dont want to push objects below us
-		if (hit.moveDirection.y < -0.3f) return;
+        // We dont want to push objects below us
+        if (hit.moveDirection.y < -0.3f) return;
 
-		// Calculate push direction from move direction, horizontal motion only
-		Vector3 pushDir = new Vector3(hit.moveDirection.x, 0.0f, hit.moveDirection.z);
+        // Calculate push direction from move direction, horizontal motion only
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0.0f, hit.moveDirection.z);
+        if (!NetworkManager.Singleton.IsServer)
+        {
+            var id = body.gameObject.GetComponent<NetworkObject>().NetworkObjectId;
+            AddForceServerRpc(id, pushDir);
+        }
+        // Apply the push and take strength into account
+        body.AddForce(pushDir * strength, ForceMode.Impulse);
+    }
 
-		// Apply the push and take strength into account
-		body.AddForce(pushDir * strength, ForceMode.Impulse);
-	}
+    [ServerRpc]
+    private void AddForceServerRpc(ulong objectId, Vector3 x)
+    {
+        var clientWithDamaged = NetworkManager.Singleton.SpawnManager.SpawnedObjects[objectId].gameObject.GetComponent<Rigidbody>();
+        clientWithDamaged.AddForce(x * strength, ForceMode.Impulse);
+    }
 }
