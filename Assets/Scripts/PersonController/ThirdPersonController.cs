@@ -35,7 +35,8 @@ namespace StarterAssets
         public Renderer myObject;
         [SerializeField]
         private float rotationSpeed = 2.5f;
-
+        [SerializeField]
+        private AudioSource punchSound;
 
         [SerializeField]
         private float _targetRotation = 0.0f;
@@ -618,6 +619,7 @@ namespace StarterAssets
         [ServerRpc(RequireOwnership = false)]
         private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
         {
+            punchSound.Play();
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<ThirdPersonController>();
 

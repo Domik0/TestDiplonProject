@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
+using Unity.Mathematics;
 
 namespace Assets.Scripts.UI
 {
@@ -12,12 +14,14 @@ namespace Assets.Scripts.UI
     {
         [SerializeField] 
         Slider volumeSlider;
+        [SerializeField]
+        AudioMixer Mixer;
 
         private void Start()
         {
-            if (!PlayerPrefs.HasKey("musicVolume"))
+            if (!PlayerPrefs.HasKey("MasterVolume"))
             {
-                PlayerPrefs.SetFloat("musicVolume",1);
+                PlayerPrefs.SetFloat("MasterVolume", 1);
                 Load();
             }
             else
@@ -28,18 +32,18 @@ namespace Assets.Scripts.UI
 
         private void Load()
         {
-            volumeSlider.value = PlayerPrefs.GetFloat("musicVolume");
+            volumeSlider.value = PlayerPrefs.GetFloat("MasterVolume");
         }
 
-        public void ChangeVolume()
+        public void ChangeVolume(float volume)
         {
-            AudioListener.volume = volumeSlider.value;
-            Save();
+           Mixer.SetFloat("MasterVolume", Mathf.Lerp(-80,0,volume));
+           Save();
         }
 
         private void Save()
         {
-            PlayerPrefs.SetFloat("musicVolume", volumeSlider.value);
+            PlayerPrefs.SetFloat("MasterVolume", volumeSlider.value);
         }
 
     }

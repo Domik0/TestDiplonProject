@@ -332,7 +332,7 @@ PrefabInstance:
       objectReference: {fileID: 212038982}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.size
-      value: 4
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.ClientConnectionBufferTimeout
@@ -349,15 +349,15 @@ PrefabInstance:
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[1].Prefab
       value: 
-      objectReference: {fileID: 1808265353395088, guid: 296b6c6ad62626c48aef7fa6c5e2a9a8, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[2].Prefab
       value: 
-      objectReference: {fileID: 1109385109949186, guid: 37e681eb08549004c9d9c2be529cbf54, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[3].Prefab
       value: 
-      objectReference: {fileID: 1118085362977378, guid: 5527826a6315a224d850675a730c4f62, type: 3}
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
 --- !u!1001 &366546943
@@ -760,8 +760,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1631495036261246737, guid: f37acd5599dc6a04181124921cd8c70f, type: 3}
       propertyPath: m_Volume
-      value: 0.485
+      value: 0.863
       objectReference: {fileID: 0}
+    - target: {fileID: 1631495036261246737, guid: f37acd5599dc6a04181124921cd8c70f, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 24300002, guid: 8547143f2f1ac924abe03ffcfd3cd7ed, type: 2}
     - target: {fileID: 1631495036261246738, guid: f37acd5599dc6a04181124921cd8c70f, type: 3}
       propertyPath: m_Name
       value: Music

@@ -14,9 +14,6 @@ public class SpawnManager : NetworkBehaviour
     [SerializeField] NetworkObject PlayerPrefab;
     [SerializeField] NetworkObject ChestPrefab;
 
-    [SerializeField]
-    private Vector2 defaultInitialPositionOnPlane = new Vector2(-4, 4);
-
     private NetworkList<int> listSpawnPlayer = new NetworkList<int>();
     private NetworkList<int> listSpawnChest = new NetworkList<int>();
     private static NetworkVariable<bool> isTagSpawned = new NetworkVariable<bool>();
@@ -51,7 +48,7 @@ public class SpawnManager : NetworkBehaviour
         {
             if (item.ClientId == NetworkManager.LocalClientId)
             {
-                SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, item.PlayerName.Value);
+                SpawnPlayerServerRpc(NetworkManager.Singleton.LocalClientId, item.PlayerName.Value,rndSpawnPointId);
                 break;
             }
         }
@@ -67,11 +64,30 @@ public class SpawnManager : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void SpawnPlayerServerRpc(ulong localClientId,string nick)
+    private void SpawnPlayerServerRpc(ulong localClientId,string nick, int rndSpawnPointId)
     {
-        Vector3 positon= new Vector3(Random.Range(defaultInitialPositionOnPlane.x, defaultInitialPositionOnPlane.y), 0,
-                    Random.Range(0,2));
-        var go = Instantiate(PlayerPrefab,  positon,Quaternion.identity);
+        Vector3 spawnPos = Vector3.zero;
+        Quaternion spawnRot = Quaternion.identity;
+        switch (rndSpawnPointId)
+        {
+            case 0:
+                spawnPos = new Vector3(0f, 0f, 0f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
+                break;
+            case 1:
+                spawnPos = new Vector3(2f, 0f, 0f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
+                break;
+            case 2:
+                spawnPos = new Vector3(4f, 0f, 0f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
+                break;
+            case 3:
+                spawnPos = new Vector3(6f, 0f, 0f);
+                spawnRot = Quaternion.Euler(0f, 0f, 0f);
+                break;
+        }
+        var go = Instantiate(PlayerPrefab, spawnPos, spawnRot);
         var controller = go.GetComponent<ThirdPersonController>();
         controller.nickName.Value = nick;
         if (loudingCount.Value == rndTag.Value)
