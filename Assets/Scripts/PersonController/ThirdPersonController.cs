@@ -35,7 +35,8 @@ namespace StarterAssets
         public Renderer myObject;
         [SerializeField]
         private float rotationSpeed = 2.5f;
-
+        [SerializeField]
+        private Transform hand;
 
         [SerializeField]
         private float _targetRotation = 0.0f;
@@ -413,17 +414,27 @@ namespace StarterAssets
 
         private void Throwing()
         {
-            Cursor.lockState = CursorLockMode.Locked;
-            if (Input.GetMouseButtonDown(0))
+            
+            if (isThrow)
             {
-                Inst = Instantiate(Granade, transform.position, transform.rotation);
-                Inst.GetComponent<Rigidbody>().AddForce(transform.forward * PowerGranade * 2);
+                
+                Inst = Instantiate(Granade, hand.position, hand.rotation);
+                Inst.GetComponent<Rigidbody>().isKinematic = true;
+                animator.SetBool("Throw", true);
+                Inst.transform.parent = null;
+                Inst.GetComponent<Rigidbody>().isKinematic = false;
+                Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade * 2,ForceMode.Impulse);
+                   
+             
             }
-            if (Input.GetMouseButtonDown(1))
+            if (!isThrow)
             {
-                Inst = Instantiate(Granade, transform.position, transform.rotation);
-                Inst.GetComponent<Rigidbody>().AddForce(transform.forward * PowerGranade);
+                if (animator.GetBool("Throw"))
+                {
+                    animator.SetBool("Throw", false);
+                }
             }
+
 
             //if (isThrow)
             //{
