@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1208194626699242358}
   - component: {fileID: 1347132495033902411}
   - component: {fileID: 4650074598243109491}
+  - component: {fileID: -4840780147027535717}
   m_Layer: 0
   m_Name: Bomb
   m_TagString: Untagged
@@ -29,8 +30,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8936254276041740111}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 2.07, z: 2.43}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.0000000059031, y: 2.0722, z: 2.43}
+  m_LocalScale: {x: 5, y: 5, z: 5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -117,8 +118,23 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!114 &4650074598243109491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8936254276041740111}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 335edc0789e229247affb6eb36a2e6ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  delay: 3
+  isThrow: 0
+  explosionEffect: {fileID: 0}
+--- !u!114 &-4840780147027535717
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -127,6 +143,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 8936254276041740111}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 335edc0789e229247affb6eb36a2e6ae, type: 3}
+  m_Script: {fileID: 11500000, guid: f6d7b2a1b0192ec438b21d2302833ec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  explosion: {fileID: 8853087269399300811, guid: 4075442da79571840a93fafd5b8ee4cc, type: 3}
+  Tag: MainCamera

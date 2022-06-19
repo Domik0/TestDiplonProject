@@ -1214,6 +1214,8 @@ MonoBehaviour:
   JumpTimeout: 0.5
   FallTimeout: 0.15
   SpeedChangeRate: 10
+  Granade: {fileID: 8936254276041740111, guid: 01dd31429a7b894438d39f6d6b235234, type: 3}
+  PowerGranade: 500
 --- !u!114 &8884071756034153414
 MonoBehaviour:
   m_ObjectHideFlags: 0

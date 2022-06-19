@@ -98,6 +98,10 @@ namespace StarterAssets
         private Animator animator;
         private InventoryWindow targetInventoryWindow;
 
+        public GameObject Granade;
+        private GameObject Inst;
+        public float PowerGranade = 500f;
+
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
         private double _punchTimeoutDelta;
@@ -409,37 +413,49 @@ namespace StarterAssets
 
         private void Throwing()
         {
-            if (isThrow)
+            Cursor.lockState = CursorLockMode.Locked;
+            if (Input.GetMouseButtonDown(0))
             {
-                if (_throwTimeoutDelta <= 0.0f)
-                {
-                    currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
-                    _throwTimeoutDelta = currentBonus.timeDurationBonus;
-                }
+                Inst = Instantiate(Granade, transform.position, transform.rotation);
+                Inst.GetComponent<Rigidbody>().AddForce(transform.forward * PowerGranade * 2);
+            }
+            if (Input.GetMouseButtonDown(1))
+            {
+                Inst = Instantiate(Granade, transform.position, transform.rotation);
+                Inst.GetComponent<Rigidbody>().AddForce(transform.forward * PowerGranade);
             }
 
-            if (_throwTimeoutDelta <= 0.0f && currentBonus != null)
-            {
-                switch (currentBonus.title)
-                {
-                    case "InvisibilityPotion":
-                        UpdateVisibilityServerRpc(true);
-                        targetInventoryWindow.targetInventory.RemoveItemAt(0);
-                        currentBonus = null;
-                        break;
-                }
-            }
+            //if (isThrow)
+            //{
+            //    if (_throwTimeoutDelta <= 0.0f)
+            //    {
+            //        currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
+            //        _throwTimeoutDelta = currentBonus.timeDurationBonus;
+            //    }
+            //}
 
-            if (_throwTimeoutDelta >= 0.0f && currentBonus != null)
-            {
-                switch (currentBonus.title)
-                {
-                    case "InvisibilityPotion":
-                        UpdateVisibilityServerRpc(false);
-                        break;
-                }
-                _throwTimeoutDelta -= Time.deltaTime;
-            }
+            //if (_throwTimeoutDelta <= 0.0f && currentBonus != null)
+            //{
+            //    switch (currentBonus.title)
+            //    {
+            //        case "InvisibilityPotion":
+            //            UpdateVisibilityServerRpc(true);
+            //            targetInventoryWindow.targetInventory.RemoveItemAt(0);
+            //            currentBonus = null;
+            //            break;
+            //    }
+            //}
+
+            //if (_throwTimeoutDelta >= 0.0f && currentBonus != null)
+            //{
+            //    switch (currentBonus.title)
+            //    {
+            //        case "InvisibilityPotion":
+            //            UpdateVisibilityServerRpc(false);
+            //            break;
+            //    }
+            //    _throwTimeoutDelta -= Time.deltaTime;
+            //}
         }
 
         private void GroundCheck()
@@ -653,6 +669,5 @@ namespace StarterAssets
                 col.gameObject.GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
             }
         }
-
     }
 }
