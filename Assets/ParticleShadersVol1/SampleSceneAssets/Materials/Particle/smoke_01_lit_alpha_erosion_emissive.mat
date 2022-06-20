@@ -2,15 +2,20 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: smoke_01_lit_alpha_erosion_emissive
   m_Shader: {fileID: 4800000, guid: 0be24640c9fd48746bc9f4c99d325f2c, type: 3}
-  m_ShaderKeywords: ALPHAEROSION_ON BACKLIGHT_ON EMISSION_ON SELFILLUMINATION_ON
-    SOFTPARTICLE_ON
+  m_ValidKeywords:
+  - ALPHAEROSION_ON
+  - EMISSION_ON
+  - SOFTPARTICLE_ON
+  m_InvalidKeywords:
+  - BACKLIGHT_ON
+  - SELFILLUMINATION_ON
   m_LightmapFlags: 5
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0

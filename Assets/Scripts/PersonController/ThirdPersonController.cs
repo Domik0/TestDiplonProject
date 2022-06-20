@@ -101,7 +101,7 @@ namespace StarterAssets
 
         public GameObject Granade;
         private GameObject Inst;
-        public float PowerGranade = 500f;
+        public float PowerGranade = 10f;
 
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
@@ -132,7 +132,6 @@ namespace StarterAssets
             playerInput.Player.Punch.performed += OnPunch;
             playerInput.Player.Punch.canceled += OnPunch;
             playerInput.Player.Throw.started += OnThrow;
-            playerInput.Player.Throw.performed += OnThrow;
             playerInput.Player.Throw.canceled += OnThrow;
 
         }
@@ -417,24 +416,27 @@ namespace StarterAssets
             
             if (isThrow)
             {
-                
-                Inst = Instantiate(Granade, hand.position, hand.rotation);
-                Inst.GetComponent<Rigidbody>().isKinematic = true;
-                animator.SetBool("Throw", true);
-                Inst.transform.parent = null;
-                Inst.GetComponent<Rigidbody>().isKinematic = false;
-                Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade * 2,ForceMode.Impulse);
-                   
-             
+                if (_throwTimeoutDelta <= 0.0f)
+                {
+                    animator.SetBool("Throw", true);
+                    Inst = Instantiate(Granade, hand.position, hand.rotation);
+                    Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade, ForceMode.Impulse);
+                    _throwTimeoutDelta = PunchTimeout;
+                }
+               
             }
             if (!isThrow)
             {
+                if (_throwTimeoutDelta >= 0.0f)
+                {
+                    _throwTimeoutDelta -= Time.deltaTime;
+                }
                 if (animator.GetBool("Throw"))
                 {
                     animator.SetBool("Throw", false);
                 }
             }
-
+          
 
             //if (isThrow)
             //{
