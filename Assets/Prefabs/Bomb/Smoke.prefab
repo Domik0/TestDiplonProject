@@ -31,7 +31,7 @@ Transform:
   m_GameObject: {fileID: 8936254276041740111}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.0000000059031, y: 2.0722, z: 2.43}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 20, y: 20, z: 20}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -146,5 +146,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d7b2a1b0192ec438b21d2302833ec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  explosion: {fileID: 8853087269399300811, guid: 966b2f29d1911a949a1dd4ba5dfb6205, type: 3}
+  explosion: {fileID: 101130, guid: d7bf18dd20422304ea868e95c3518f19, type: 3}
   Tag: MainCamera

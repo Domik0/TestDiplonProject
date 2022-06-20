@@ -90,18 +90,18 @@ namespace StarterAssets
         private float _animationBlend;
         private bool isJump;
         private bool isDance;
-
+        
         [SerializeField]
         public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
+
+        //public GameObject Granade;
+        private GameObject Inst;
+        public float PowerGranade = 10f;
 
         private PlayerControlAsset playerInput;
         private CharacterController playerController;
         private Animator animator;
         private InventoryWindow targetInventoryWindow;
-
-        public GameObject Granade;
-        private GameObject Inst;
-        public float PowerGranade = 10f;
 
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
@@ -413,62 +413,67 @@ namespace StarterAssets
 
         private void Throwing()
         {
-            
+
             if (isThrow)
             {
                 if (_throwTimeoutDelta <= 0.0f)
                 {
-                    animator.SetBool("Throw", true);
-                    Inst = Instantiate(Granade, hand.position, hand.rotation);
-                    Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade, ForceMode.Impulse);
-                    _throwTimeoutDelta = PunchTimeout;
+                    currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
+                    _throwTimeoutDelta = currentBonus.timeDurationBonus;
+
+                    switch (currentBonus.title)
+                    {
+                        case "InvisibilityPotion":
+                            
+                            break;
+                        default:
+                            animator.SetBool("Throw", true);
+                            Inst = Instantiate(currentBonus.Granade, hand.position, hand.rotation);
+                            Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade, ForceMode.Impulse);
+                            break;
+                    }
                 }
                
             }
             if (!isThrow)
             {
-                if (_throwTimeoutDelta >= 0.0f)
+                if (_throwTimeoutDelta <= 0.0f && currentBonus != null)
                 {
+                    switch (currentBonus.title)
+                    {
+                        case "InvisibilityPotion":
+                            UpdateVisibilityServerRpc(true);
+                            EndBonus();
+                            break;
+                        default:
+                            EndBonus();
+                            break;
+                    }
+                }
+
+                if (_throwTimeoutDelta >= 0.0f && currentBonus != null)
+                {
+                    switch (currentBonus.title)
+                    {
+                        case "InvisibilityPotion":
+                            UpdateVisibilityServerRpc(false);
+                            break;
+                    }
+
                     _throwTimeoutDelta -= Time.deltaTime;
                 }
+
                 if (animator.GetBool("Throw"))
                 {
                     animator.SetBool("Throw", false);
                 }
             }
-          
+        }
 
-            //if (isThrow)
-            //{
-            //    if (_throwTimeoutDelta <= 0.0f)
-            //    {
-            //        currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
-            //        _throwTimeoutDelta = currentBonus.timeDurationBonus;
-            //    }
-            //}
-
-            //if (_throwTimeoutDelta <= 0.0f && currentBonus != null)
-            //{
-            //    switch (currentBonus.title)
-            //    {
-            //        case "InvisibilityPotion":
-            //            UpdateVisibilityServerRpc(true);
-            //            targetInventoryWindow.targetInventory.RemoveItemAt(0);
-            //            currentBonus = null;
-            //            break;
-            //    }
-            //}
-
-            //if (_throwTimeoutDelta >= 0.0f && currentBonus != null)
-            //{
-            //    switch (currentBonus.title)
-            //    {
-            //        case "InvisibilityPotion":
-            //            UpdateVisibilityServerRpc(false);
-            //            break;
-            //    }
-            //    _throwTimeoutDelta -= Time.deltaTime;
-            //}
+        private void EndBonus()
+        {
+            targetInventoryWindow.targetInventory.RemoveItemAt(0);
+            currentBonus = null;
         }
 
         private void GroundCheck()
