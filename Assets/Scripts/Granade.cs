@@ -54,7 +54,7 @@ public class Granade : MonoBehaviour
     {
 
         //show effect
-        ExplosiveObject = Instantiate(explosion, transform.position, transform.rotation);
+        ExplosiveObject = Instantiate(explosion, transform.position, Quaternion.identity);
         //ExplosiveObject.AddComponent<AudioSource>(); // Добавляем аудио соурс
         //ExplosiveObject.GetComponent<AudioSource>().PlayOneShot(Explosion); // звук взрыва
         Debug.Log("Boom");
