@@ -8,4 +8,5 @@ public class Item : ScriptableObject
     public string title;
     public int timeDurationBonus;
     public Sprite image;
+    public GameObject Granade;
 }

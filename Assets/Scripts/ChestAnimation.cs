@@ -19,7 +19,7 @@ namespace Assets.Scripts
         private Animator _animator;
         private GameObject _prefabChest;
         private Item _itemInChest;
-        private static NetworkVariable<bool> _gaveItemPlayerFlag = new NetworkVariable<bool>();
+        private NetworkVariable<bool> _gaveItemPlayerFlag = new NetworkVariable<bool>();
         private Storage _storage;
         private bool _hasAnimator;
 
@@ -49,7 +49,7 @@ namespace Assets.Scripts
 
         public void ChestOpen(InventoryWindow targetInventoryWindow)
         {
-            if(!_gaveItemPlayerFlag.Value)
+            if(!_gaveItemPlayerFlag.Value && targetInventoryWindow.targetInventory.inventoryItems.Count < 3)
             {
                 if (!IsServer)
                 {
@@ -66,6 +66,5 @@ namespace Assets.Scripts
         {
             _animator.SetBool(parametr, status);
         }
-
     }
 }

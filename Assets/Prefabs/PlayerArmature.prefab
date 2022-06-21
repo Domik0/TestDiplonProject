@@ -188,7 +188,7 @@ Transform:
   - {fileID: 6044159111065775861}
   - {fileID: 1054072932380382983}
   m_Father: {fileID: 6135884457200830724}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &744155670857581498
 GameObject:
@@ -1039,8 +1039,8 @@ GameObject:
   - component: {fileID: 7701588975455730829}
   - component: {fileID: 693004747548200083}
   - component: {fileID: 8884071756034153414}
-  - component: {fileID: 4864104680207261358}
-  - component: {fileID: 1520333396279769363}
+  - component: {fileID: -895221554634030556}
+  - component: {fileID: -448571589379137233}
   m_Layer: 8
   m_Name: PlayerArmature
   m_TagString: Player
@@ -1199,7 +1199,9 @@ MonoBehaviour:
     m_Bits: 1
   myObject: {fileID: 5597113867290821413}
   rotationSpeed: 3.5
-  punchSound: {fileID: 4864104680207261358}
+
+  gun: {fileID: 1751319235785401812}
+  auido: {fileID: -448571589379137233}
   _targetRotation: 0
   RotationSmoothTime: 0.12
   TopClamp: 70
@@ -1211,12 +1213,13 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 8338988566280778634}
   DanceTimeout: 0.3
   PunchTimeout: 0.1
-  TagTimeout: 0.1
+  TagTimeout: 0.5
   isTag:
     m_InternalValue: 0
   JumpTimeout: 0.5
   FallTimeout: 0.15
   SpeedChangeRate: 10
+  PowerGranade: 20
 --- !u!114 &8884071756034153414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1231,7 +1234,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCameraTransform: {fileID: 0}
   billbord: {fileID: 8620372693091276847}
---- !u!82 &4864104680207261358
+--- !u!114 &-895221554634030556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416926081852918481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 257f9acb7e7743544a325c0a7111f1cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  StartItems: []
+  inventoryItems: []
+--- !u!82 &-448571589379137233
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1240,8 +1257,8 @@ AudioSource:
   m_GameObject: {fileID: 4416926081852918481}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 24300002, guid: 8547143f2f1ac924abe03ffcfd3cd7ed, type: 2}
-  m_audioClip: {fileID: 8300000, guid: 4837aabf3bf6c284e9d0760618cba9c3, type: 3}
+  OutputAudioMixerGroup: {fileID: 24300002, guid: ec32c86f3598b8d4486285b65bebbe86, type: 2}
+  m_audioClip: {fileID: 8300000, guid: 1fdc61766ab2b114dacc53634fd68d9f, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -1327,20 +1344,6 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
---- !u!114 &1520333396279769363
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4416926081852918481}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 257f9acb7e7743544a325c0a7111f1cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  StartItems: []
-  inventoryItems: []
 --- !u!1 &4523139366846529165
 GameObject:
   m_ObjectHideFlags: 0
@@ -1563,6 +1566,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1751319235785401812}
   - {fileID: 7590676344785519724}
   - {fileID: 1280561501388621616}
   - {fileID: 9036379305195573192}
@@ -1990,6 +1994,37 @@ Transform:
   m_Father: {fileID: 3283115190892659225}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6844224686548545183
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1751319235785401812}
+  m_Layer: 0
+  m_Name: Gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1751319235785401812
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6844224686548545183}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.123, z: 0.144}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6135884457200830724}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6854951857557205417
 GameObject:
   m_ObjectHideFlags: 0
@@ -2020,7 +2055,7 @@ Transform:
   m_Children:
   - {fileID: 8519642851085155206}
   m_Father: {fileID: 6135884457200830724}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6908046260977031892
 GameObject:
@@ -2860,7 +2895,7 @@ Transform:
   m_Children:
   - {fileID: 669041985738091607}
   m_Father: {fileID: 6135884457200830724}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8979680374780180007
 GameObject:

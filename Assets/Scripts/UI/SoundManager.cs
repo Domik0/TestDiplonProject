@@ -17,7 +17,7 @@ namespace Assets.Scripts.UI
         [SerializeField]
         AudioMixer Mixer;
 
-        private void Start()
+        private void Awake()
         {
             if (!PlayerPrefs.HasKey("MasterVolume"))
             {
@@ -37,8 +37,9 @@ namespace Assets.Scripts.UI
 
         public void ChangeVolume(float volume)
         {
-           Mixer.SetFloat("MasterVolume", Mathf.Lerp(-80,0,volume));
-           Save();
+            Mixer.SetFloat("MasterVolume", Mathf.Lerp(-80, 0, volumeSlider.value));
+            Save();
+
         }
 
         private void Save()
