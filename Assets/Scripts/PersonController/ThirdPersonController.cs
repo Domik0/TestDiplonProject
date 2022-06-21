@@ -36,7 +36,9 @@ namespace StarterAssets
         [SerializeField]
         private float rotationSpeed = 2.5f;
         [SerializeField]
-        private Transform hand;
+        private Transform gun;
+        [SerializeField]
+        private AudioSource auido;
 
         [SerializeField]
         private float _targetRotation = 0.0f;
@@ -428,8 +430,8 @@ namespace StarterAssets
                             break;
                         default:
                             animator.SetBool("Throw", true);
-                            Inst = Instantiate(currentBonus.Granade, hand.position, hand.rotation);
-                            Inst.GetComponent<Rigidbody>().AddForce(hand.forward * PowerGranade, ForceMode.Impulse);
+                            Inst = Instantiate(currentBonus.Granade, gun.position, gun.rotation);
+                            Inst.GetComponent<Rigidbody>().AddForce(gun.forward * PowerGranade, ForceMode.Impulse);
                             break;
                     }
                 }
@@ -616,6 +618,11 @@ namespace StarterAssets
                         {
                             if (_tagTimeoutDelta <= 0)
                             {
+                                if (!IsServer)
+                                {
+                                    PlaySoundServerRpc();
+                                }
+                                auido.Play();
                                 if (isTag.Value)
                                 {
                                     UpdateTagServerRpc(true, playerHit.OwnerClientId);
@@ -647,6 +654,12 @@ namespace StarterAssets
                     JumpHeight = 1.2f;
                     break;
             }
+        }
+
+        [ServerRpc(Delivery=RpcDelivery.Unreliable)]
+        private void PlaySoundServerRpc()
+        {
+            auido.Play();
         }
 
         [ServerRpc(RequireOwnership = false)]

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.UI
@@ -12,8 +13,10 @@ namespace Assets.Scripts.UI
     {
         [SerializeField] 
         Slider volumeSlider;
+        [SerializeField]
+        AudioMixer Mixer;
 
-        private void Start()
+        private void Awake()
         {
             if (!PlayerPrefs.HasKey("musicVolume"))
             {
@@ -33,7 +36,7 @@ namespace Assets.Scripts.UI
 
         public void ChangeVolume()
         {
-            AudioListener.volume = volumeSlider.value;
+            Mixer.SetFloat("MasterVolume", Mathf.Lerp(-80, 0, volumeSlider.value));
             Save();
         }
 
