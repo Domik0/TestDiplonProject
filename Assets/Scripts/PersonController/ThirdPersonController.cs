@@ -679,6 +679,7 @@ namespace StarterAssets
         [ServerRpc(RequireOwnership = false)]
         private void UpdateTagServerRpc(bool tagStatus, ulong clientId)
         {
+            punchSound.Play();
             var clientWithDamaged = NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<ThirdPersonController>();
 

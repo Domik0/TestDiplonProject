@@ -1199,6 +1199,7 @@ MonoBehaviour:
     m_Bits: 1
   myObject: {fileID: 5597113867290821413}
   rotationSpeed: 3.5
+
   gun: {fileID: 1751319235785401812}
   auido: {fileID: -448571589379137233}
   _targetRotation: 0
