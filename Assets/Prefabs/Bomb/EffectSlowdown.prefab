@@ -75,7 +75,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1902249764402496, guid: 3275c3ac8f8032048bed7c59042ce4d4, type: 3}
       propertyPath: m_Name
-      value: Poison Variant
+      value: EffectSlowdown
       objectReference: {fileID: 0}
     - target: {fileID: 4949994979569460, guid: 3275c3ac8f8032048bed7c59042ce4d4, type: 3}
       propertyPath: m_RootOrder
@@ -223,7 +223,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 198490803122769174, guid: 3275c3ac8f8032048bed7c59042ce4d4, type: 3}
       propertyPath: lengthInSec
-      value: 35
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 198490803122769174, guid: 3275c3ac8f8032048bed7c59042ce4d4, type: 3}
       propertyPath: playOnAwake

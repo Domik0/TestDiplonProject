@@ -108,6 +108,8 @@ namespace StarterAssets
         private Vector2 currentMovementInput;
         private double _danceTimeoutDelta;
         private double _punchTimeoutDelta;
+        private double _stunTimeoutDelta;
+        private double _slowTimeoutDelta;
         private double _throwTimeoutDelta;
         private double _tagTimeoutDelta;
         private bool isPunch;
@@ -167,8 +169,21 @@ namespace StarterAssets
 
         private void Move()
         {
+            if (_stunTimeoutDelta >= 0)
+            {
+                _stunTimeoutDelta -= Time.deltaTime;
+                return;
+            }
+
             bool isSprint = CheckSprint(currentMovementInput);
             float targetSpeed = isSprint ? SprintSpeed : MoveSpeed;
+
+            if (_slowTimeoutDelta > 0)
+            {
+                _slowTimeoutDelta -= Time.deltaTime;
+                targetSpeed *= 0.5f;
+            }
+
             // a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
             // note: Vector2's == operator uses approximation so is not floating point error prone, and is cheaper than magnitude
             // if there is no input, set the target speed to 0
@@ -415,7 +430,6 @@ namespace StarterAssets
 
         private void Throwing()
         {
-
             if (isThrow)
             {
                 if (_throwTimeoutDelta <= 0.0f)
@@ -699,6 +713,16 @@ namespace StarterAssets
             {
                 col.gameObject.GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
             }
+        }
+
+        public void StunMove()
+        {
+            _stunTimeoutDelta = 3f;
+        }
+
+        public void SlowMove()
+        {
+            _slowTimeoutDelta = 2f;
         }
     }
 }

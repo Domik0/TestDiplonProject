@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3dddf86f0e7a9e43bd5b90f12e5ccea, type: 3}
-  m_Name: BombSlowdown
+  m_Name: BombStun
   m_EditorClassIdentifier: 
   title: BombSlowdown
   timeDurationBonus: 10

@@ -7,21 +7,10 @@ public class Slowdown : MonoBehaviour
 {
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.gameObject.tag == "Tag")
+        var th = collision.GetComponent<ThirdPersonController>();
+        if (th != null)
         {
-            collision.gameObject.GetComponent<ThirdPersonController>().MoveSpeed -= 1;
-            collision.gameObject.GetComponent<ThirdPersonController>().SprintSpeed -= 1;
-            Debug.Log("Замедляемся");
-        }
-    }
-
-    private void OnTriggerExit(Collider collision)
-    {
-        if (collision.gameObject.tag == "Tag")
-        {
-            collision.gameObject.GetComponent<ThirdPersonController>().MoveSpeed += 1;
-            collision.gameObject.GetComponent<ThirdPersonController>().SprintSpeed += 1;
-            Debug.Log("Не замедляемься");
+            th.SlowMove();
         }
     }
 }

@@ -96,7 +96,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8936254276041740111}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 9af2f4cf7ffdea049a811242e0da2970, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
   m_Radius: 0.0137422085
@@ -146,5 +146,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6d7b2a1b0192ec438b21d2302833ec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  name: Smoke
+  delay: 3
+  radius: 5
   explosion: {fileID: 101130, guid: d7bf18dd20422304ea868e95c3518f19, type: 3}
   Tag: MainCamera

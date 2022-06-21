@@ -1199,7 +1199,7 @@ MonoBehaviour:
     m_Bits: 1
   myObject: {fileID: 5597113867290821413}
   rotationSpeed: 3.5
-  gun: {fileID: 0}
+  gun: {fileID: 1751319235785401812}
   auido: {fileID: -448571589379137233}
   _targetRotation: 0
   RotationSmoothTime: 0.12
@@ -1212,13 +1212,13 @@ MonoBehaviour:
   CinemachineCameraTarget: {fileID: 8338988566280778634}
   DanceTimeout: 0.3
   PunchTimeout: 0.1
-  TagTimeout: 0.3
+  TagTimeout: 0.5
   isTag:
     m_InternalValue: 0
   JumpTimeout: 0.5
   FallTimeout: 0.15
   SpeedChangeRate: 10
-  PowerGranade: 500
+  PowerGranade: 20
 --- !u!114 &8884071756034153414
 MonoBehaviour:
   m_ObjectHideFlags: 0
