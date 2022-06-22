@@ -26,7 +26,7 @@ namespace Assets.Scripts
 
         public void ChestOpen(InventoryWindow targetInventoryWindow)
         {
-            if (!_gaveItemPlayerFlag.Value && targetInventoryWindow.targetInventory.inventoryItems.Count < 3)
+            if (!_gaveItemPlayerFlag.Value)
             {
                 if (!IsServer)
                 {

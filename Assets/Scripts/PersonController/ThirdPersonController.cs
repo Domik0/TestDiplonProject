@@ -16,11 +16,6 @@ namespace StarterAssets
 
     public class ThirdPersonController : NetworkBehaviour
     {
-        
-        
-
-        
-
         [Header("Player")]
         private PlayerControlAsset playerInput;
         private CharacterController playerController;
@@ -753,7 +748,10 @@ namespace StarterAssets
         {
             if (col.gameObject.tag == "Chest")
             {
-                col.gameObject.GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
+                if (targetInventoryWindow.targetInventory.inventoryItems.Count < 3)
+                {
+                    col.gameObject.GetComponentInParent<ChestAnimation>().ChestOpen(targetInventoryWindow);
+                }
             }
         }
 
