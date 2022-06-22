@@ -15,6 +15,9 @@ GameObject:
   - component: {fileID: 1347132495033902411}
   - component: {fileID: 4650074598243109491}
   - component: {fileID: -4840780147027535717}
+  - component: {fileID: 2006354830942515324}
+  - component: {fileID: 4322635945838042584}
+  - component: {fileID: 9105540961818001735}
   m_Layer: 0
   m_Name: Smoke
   m_TagString: Untagged
@@ -31,7 +34,7 @@ Transform:
   m_GameObject: {fileID: 8936254276041740111}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.0000000059031, y: 2.0722, z: 2.43}
-  m_LocalScale: {x: 20, y: 20, z: 20}
+  m_LocalScale: {x: 11, y: 11, z: 11}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -149,5 +152,61 @@ MonoBehaviour:
   name: Smoke
   delay: 3
   radius: 5
-  explosion: {fileID: 101130, guid: d7bf18dd20422304ea868e95c3518f19, type: 3}
+  explosionSmoke: {fileID: -4865875843938689973, guid: d7bf18dd20422304ea868e95c3518f19, type: 3}
+  explosionStun: {fileID: -3828332303750748397, guid: 2cefe2d7512ba8b419a754c32b8230fe, type: 3}
+  explosionSlowdown: {fileID: -3324983024202519329, guid: 22575172217edb443a6187e7b6639091, type: 3}
   Tag: MainCamera
+--- !u!114 &2006354830942515324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8936254276041740111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &4322635945838042584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8936254276041740111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 1
+  SyncScaleY: 1
+  SyncScaleZ: 1
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  InLocalSpace: 0
+  Interpolate: 1
+--- !u!114 &9105540961818001735
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8936254276041740111}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

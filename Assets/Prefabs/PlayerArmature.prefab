@@ -1218,6 +1218,9 @@ MonoBehaviour:
   JumpTimeout: 0.5
   FallTimeout: 0.15
   SpeedChangeRate: 10
+  Smoke: {fileID: 2006354830942515324, guid: 9cac60b4f22396c45985cb7814abbf19, type: 3}
+  Slowdown: {fileID: -4541633408063193309, guid: c14595d434dea2c4f851eb73f42735a4, type: 3}
+  Stun: {fileID: -7965426138390345028, guid: 01dd31429a7b894438d39f6d6b235234, type: 3}
   PowerGranade: 20
 --- !u!114 &8884071756034153414
 MonoBehaviour:
@@ -2017,7 +2020,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6844224686548545183}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.123, z: 0.144}
+  m_LocalPosition: {x: 0.011, y: 0.091, z: 0.153}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -57,8 +57,15 @@ namespace Assets.Scripts
                 }
                 _animator.SetBool("ChestOpen",true);
                 targetInventoryWindow.targetInventory.AddItem(_storage.GetItem(_itemInChest.title));
-                _gaveItemPlayerFlag.Value = true;
+                ChangeGiveServerRpc(true);
             }
+        }
+
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ChangeGiveServerRpc(bool status)
+        {
+            _gaveItemPlayerFlag.Value = status;
         }
 
         [ServerRpc(RequireOwnership = false)]

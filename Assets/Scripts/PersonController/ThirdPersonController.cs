@@ -92,12 +92,20 @@ namespace StarterAssets
         private float _animationBlend;
         private bool isJump;
         private bool isDance;
-        
+
+        [SerializeField]
+        private NetworkObject Smoke;
+        [SerializeField]
+        private NetworkObject Slowdown;
+        [SerializeField]
+        private NetworkObject Stun;
+
+        private NetworkObject bonus;
         [SerializeField]
         public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
 
         //public GameObject Granade;
-        private GameObject Inst;
+        private NetworkObject Inst;
         public float PowerGranade = 10f;
 
         private PlayerControlAsset playerInput;
@@ -434,7 +442,12 @@ namespace StarterAssets
             {
                 if (_throwTimeoutDelta <= 0.0f)
                 {
-                    currentBonus = targetInventoryWindow.targetInventory.inventoryItems.First();
+                    
+                    currentBonus = targetInventoryWindow.targetInventory.inventoryItems.FirstOrDefault();
+                    if (currentBonus == null)
+                    {
+                        return;
+                    }
                     _throwTimeoutDelta = currentBonus.timeDurationBonus;
 
                     switch (currentBonus.title)
@@ -443,9 +456,25 @@ namespace StarterAssets
                             
                             break;
                         default:
+                            if (!IsServer)
+                            {
+                                UpdateAnimatorServerRpc("Throw", true);
+                            }
                             animator.SetBool("Throw", true);
-                            Inst = Instantiate(currentBonus.Granade, gun.position, gun.rotation);
-                            Inst.GetComponent<Rigidbody>().AddForce(gun.forward * PowerGranade, ForceMode.Impulse);
+                            if(currentBonus.name== "BombStun")
+                            {
+                                SpawnStunServerRpc(gun.position, gun.rotation, gun.forward,PowerGranade);
+                            }
+                            if (currentBonus.name=="Smoke")
+                            {
+                                SpawnSmokeServerRpc(gun.position, gun.rotation, gun.forward, PowerGranade);
+                            }
+                            if (currentBonus.name == "Slowdown")
+                            {
+                                SpawnSlowdownServerRpc(gun.position, gun.rotation, gun.forward, PowerGranade);
+                            }
+                            
+
                             break;
                     }
                 }
@@ -481,6 +510,10 @@ namespace StarterAssets
 
                 if (animator.GetBool("Throw"))
                 {
+                    if (!IsServer)
+                    {
+                        UpdateAnimatorServerRpc("Throw", false);
+                    }
                     animator.SetBool("Throw", false);
                 }
             }
@@ -491,6 +524,36 @@ namespace StarterAssets
             targetInventoryWindow.targetInventory.RemoveItemAt(0);
             currentBonus = null;
         }
+
+        [ServerRpc]
+        private void SpawnSmokeServerRpc(Vector3 position,Quaternion rotation,Vector3 forward,float power)
+        {
+            NetworkObject ballInstance  = Instantiate(Smoke, position, rotation);
+            ballInstance.SpawnWithOwnership(OwnerClientId);
+            ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
+        }
+
+
+        [ServerRpc]
+        private void SpawnSlowdownServerRpc(Vector3 position, Quaternion rotation, Vector3 forward, float power)
+        {
+            NetworkObject ballInstance = Instantiate(Slowdown, position, rotation);
+            ballInstance.SpawnWithOwnership(OwnerClientId);
+            ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
+
+        }
+
+        [ServerRpc]
+        private void SpawnStunServerRpc(Vector3 position, Quaternion rotation, Vector3 forward, float power)
+        {
+            NetworkObject ballInstance = Instantiate(Stun, position, rotation);
+            ballInstance.SpawnWithOwnership(OwnerClientId);
+            ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
+
+
+        }
+
+
 
         private void GroundCheck()
         {

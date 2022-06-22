@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using StarterAssets;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Granade : MonoBehaviour
+public class Granade : NetworkBehaviour
 {
     public string name;
     public float delay = 0.3f; // Задержка перед взрывом
@@ -13,7 +14,9 @@ public class Granade : MonoBehaviour
     //public AudioClip Explosion; // звук взрыва
     //private AudioSource AudioSouce; // аудио соурс
 
-    public GameObject explosion; // Эффект
+    public NetworkObject explosionSmoke;
+    public NetworkObject explosionStun;
+    public NetworkObject explosionSlowdown;
     private GameObject ExplosiveObject; // обект который показывает эффект при взрыве
 
     public string Tag;
@@ -41,7 +44,7 @@ public class Granade : MonoBehaviour
 
         if (countdown <= 0f) //Если таймер сработал
         {
-            Explode();
+           Explode(transform.position,name);
         }
     }
 
@@ -50,30 +53,69 @@ public class Granade : MonoBehaviour
         hasCollision = true;
     }
 
-    void Explode() // При взрыве
+    void Explode(Vector3 position,string name) // При взрыве
     {
+        SpawnEffectServerRpc(position, name);
 
-        //show effect
-        ExplosiveObject = Instantiate(explosion, transform.position, Quaternion.identity);
         //ExplosiveObject.AddComponent<AudioSource>(); // Добавляем аудио соурс
         //ExplosiveObject.GetComponent<AudioSource>().PlayOneShot(Explosion); // звук взрыва
-        Debug.Log("Boom");
+        //  Debug.Log("Boom");
 
-        if(name == "BombStun")
+        if (name == "BombStun")
         {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, radius);
+            Collider[] colliders = Physics.OverlapSphere(position, radius);
 
             foreach (Collider nearbyObject in colliders) // Объекты попавшие в радиус взрыва
             {
-                //Тут могла быть ваша функция 
+
                 var th = nearbyObject.GetComponent<ThirdPersonController>();
                 if (th != null)
                 {
-                    th.StunMove();
+                    StunServerRpc(th.OwnerClientId);
                 }
             }
         }
-        
+
+       
+        DestroyBonusServerRpc();
+    }
+
+    [ServerRpc(RequireOwnership =false)]
+    private void StunServerRpc(ulong clientId)
+    {
+        NetworkManager.Singleton.ConnectedClients[clientId]
+                .PlayerObject.GetComponent<ThirdPersonController>().StunMove();
+    }
+
+
+
+
+
+    [ServerRpc(RequireOwnership =false)]
+    private void SpawnEffectServerRpc(Vector3 position,string nameBonus)
+    {
+        NetworkObject effectInstance = null;
+        if (nameBonus == "BombStun")
+        {
+            effectInstance = Instantiate(explosionStun, position, Quaternion.identity);
+        }
+        if (nameBonus == "Smoke")
+        {
+            effectInstance = Instantiate(explosionSmoke, position, Quaternion.identity);
+        }
+        if (nameBonus == "Slowdown")
+        {
+            effectInstance = Instantiate(explosionSlowdown, position, Quaternion.identity);
+        }
+
+        effectInstance.Spawn();
+    }
+
+
+    [ServerRpc(RequireOwnership =false)]
+    void DestroyBonusServerRpc()
+    {
         Destroy(gameObject);
     }
+
 }

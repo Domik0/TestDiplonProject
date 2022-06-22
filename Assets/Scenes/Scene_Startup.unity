@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -336,7 +336,7 @@ PrefabInstance:
       objectReference: {fileID: 212038982}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.size
-      value: 1
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.ClientConnectionBufferTimeout
@@ -353,15 +353,27 @@ PrefabInstance:
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[1].Prefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 2955623459812423943, guid: 2cefe2d7512ba8b419a754c32b8230fe, type: 3}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[2].Prefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 8853087269399300811, guid: 22575172217edb443a6187e7b6639091, type: 3}
     - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
       propertyPath: NetworkConfig.NetworkPrefabs.Array.data[3].Prefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 101130, guid: d7bf18dd20422304ea868e95c3518f19, type: 3}
+    - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
+      propertyPath: NetworkConfig.NetworkPrefabs.Array.data[4].Prefab
+      value: 
+      objectReference: {fileID: 8936254276041740111, guid: 01dd31429a7b894438d39f6d6b235234, type: 3}
+    - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
+      propertyPath: NetworkConfig.NetworkPrefabs.Array.data[5].Prefab
+      value: 
+      objectReference: {fileID: 8936254276041740111, guid: c14595d434dea2c4f851eb73f42735a4, type: 3}
+    - target: {fileID: 6500144650341040423, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
+      propertyPath: NetworkConfig.NetworkPrefabs.Array.data[6].Prefab
+      value: 
+      objectReference: {fileID: 8936254276041740111, guid: 9cac60b4f22396c45985cb7814abbf19, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a5d283e0527ecd49941f7ef26115906, type: 3}
 --- !u!1001 &366546943

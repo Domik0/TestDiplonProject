@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3dddf86f0e7a9e43bd5b90f12e5ccea, type: 3}
   m_Name: BombStun
   m_EditorClassIdentifier: 
-  title: BombSlowdown
+  title: BombStun
   timeDurationBonus: 10
   image: {fileID: 21300000, guid: 72ada516c9a186343b5cb40dfa72f1c1, type: 3}
   Granade: {fileID: 8936254276041740111, guid: 01dd31429a7b894438d39f6d6b235234, type: 3}

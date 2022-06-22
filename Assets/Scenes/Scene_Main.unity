@@ -2659,7 +2659,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-96812
+  m_Name: pb_Mesh-64202
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -2886,6 +2886,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 157769445}
     m_Modifications:
+    - target: {fileID: -4385345714653915850, guid: 5527826a6315a224d850675a730c4f62, type: 3}
+      propertyPath: m_Mass
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1118085362977378, guid: 5527826a6315a224d850675a730c4f62, type: 3}
       propertyPath: m_Name
       value: SM_PolygonPrototype_Prop_Crate_03 (15)
@@ -3006,6 +3010,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 157769445}
     m_Modifications:
+    - target: {fileID: -4385345714653915850, guid: 5527826a6315a224d850675a730c4f62, type: 3}
+      propertyPath: m_Mass
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1118085362977378, guid: 5527826a6315a224d850675a730c4f62, type: 3}
       propertyPath: m_Name
       value: SM_PolygonPrototype_Prop_Crate_03 (14)
@@ -5717,6 +5725,10 @@ PrefabInstance:
     - target: {fileID: -2302200588174752086, guid: 296b6c6ad62626c48aef7fa6c5e2a9a8, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 3250033416
+      objectReference: {fileID: 0}
+    - target: {fileID: -495334231793475509, guid: 296b6c6ad62626c48aef7fa6c5e2a9a8, type: 3}
+      propertyPath: m_Mass
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 1808265353395088, guid: 296b6c6ad62626c48aef7fa6c5e2a9a8, type: 3}
       propertyPath: m_Name
@@ -10201,7 +10213,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-96826
+  m_Name: pb_Mesh-64216
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -15652,6 +15664,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 157769445}
     m_Modifications:
+    - target: {fileID: -4385345714653915850, guid: 5527826a6315a224d850675a730c4f62, type: 3}
+      propertyPath: m_Mass
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 1118085362977378, guid: 5527826a6315a224d850675a730c4f62, type: 3}
       propertyPath: m_Name
       value: SM_PolygonPrototype_Prop_Crate_03 (10)
@@ -16346,7 +16362,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-96840
+  m_Name: pb_Mesh-64230
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -17629,7 +17645,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh-96798
+  m_Name: pb_Mesh-64188
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -28246,6 +28262,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 157769445}
     m_Modifications:
+    - target: {fileID: -4385345714653915850, guid: 5527826a6315a224d850675a730c4f62, type: 3}
+      propertyPath: m_Mass
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1118085362977378, guid: 5527826a6315a224d850675a730c4f62, type: 3}
       propertyPath: m_Name
       value: SM_PolygonPrototype_Prop_Crate_03 (13)
