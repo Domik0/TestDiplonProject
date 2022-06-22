@@ -14,11 +14,8 @@ namespace StarterAssets
         private static ClientGameNetPortal instance;
 
         public DisconnectReason DisconnectReason { get; private set; } = new DisconnectReason();
-
         public event Action<ConnectStatus> OnConnectionFinished;
-
         public event Action OnNetworkTimedOut;
-
         private GameNetPortal gameNetPortal;
 
         private void Awake()
@@ -40,7 +37,6 @@ namespace StarterAssets
             gameNetPortal.OnConnectionFinished += HandleConnectionFinished;
             gameNetPortal.OnDisconnectReasonReceived += HandleDisconnectReasonReceived;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
-            
         }
 
         private void OnDestroy()
@@ -56,7 +52,7 @@ namespace StarterAssets
             NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect;
         }
 
-        public  void StartClient(string joinCode)
+        public void StartClient(string joinCode)
         {
             var payload = JsonUtility.ToJson(new ConnectionPayload()
             {
@@ -68,13 +64,10 @@ namespace StarterAssets
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
             NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
-            
+
 
             NetworkManager.Singleton.StartClient();
             SceneLoaderWrapper.Instance.AddOnSceneEventCallback();
-
-
-
         }
 
         private void HandleNetworkReadied()
@@ -91,7 +84,7 @@ namespace StarterAssets
         {
             DisconnectReason.SetDisconnectReason(ConnectStatus.UserRequestedDisconnect);
             NetworkManager.Singleton.Shutdown();
-           
+
             HandleClientDisconnect(NetworkManager.Singleton.LocalClientId);
 
             SceneManager.LoadScene("Scene_Menu");

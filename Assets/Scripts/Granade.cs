@@ -17,10 +17,6 @@ public class Granade : NetworkBehaviour
     public NetworkObject explosionSmoke;
     public NetworkObject explosionStun;
     public NetworkObject explosionSlowdown;
-    private GameObject ExplosiveObject; // обект который показывает эффект при взрыве
-
-    public string Tag;
-
 
     float countdown; // скрытый таймер
     bool hasCollision = false;
@@ -44,7 +40,7 @@ public class Granade : NetworkBehaviour
 
         if (countdown <= 0f) //Если таймер сработал
         {
-           Explode(transform.position,name);
+            Explode(transform.position, name);
         }
     }
 
@@ -53,13 +49,12 @@ public class Granade : NetworkBehaviour
         hasCollision = true;
     }
 
-    void Explode(Vector3 position,string name) // При взрыве
+    void Explode(Vector3 position, string name) // При взрыве
     {
         SpawnEffectServerRpc(position, name);
 
         //ExplosiveObject.AddComponent<AudioSource>(); // Добавляем аудио соурс
         //ExplosiveObject.GetComponent<AudioSource>().PlayOneShot(Explosion); // звук взрыва
-        //  Debug.Log("Boom");
 
         if (name == "BombStun")
         {
@@ -76,23 +71,18 @@ public class Granade : NetworkBehaviour
             }
         }
 
-       
         DestroyBonusServerRpc();
     }
 
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     private void StunServerRpc(ulong clientId)
     {
         NetworkManager.Singleton.ConnectedClients[clientId]
                 .PlayerObject.GetComponent<ThirdPersonController>().StunMove();
     }
 
-
-
-
-
-    [ServerRpc(RequireOwnership =false)]
-    private void SpawnEffectServerRpc(Vector3 position,string nameBonus)
+    [ServerRpc(RequireOwnership = false)]
+    private void SpawnEffectServerRpc(Vector3 position, string nameBonus)
     {
         NetworkObject effectInstance = null;
         if (nameBonus == "BombStun")
@@ -111,11 +101,9 @@ public class Granade : NetworkBehaviour
         effectInstance.Spawn();
     }
 
-
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     void DestroyBonusServerRpc()
     {
         Destroy(gameObject);
     }
-
 }

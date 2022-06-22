@@ -14,21 +14,14 @@ namespace StarterAssets
     public class MainMenuUI : MonoBehaviour
     {
         [Header("References")]
-
         [SerializeField]
         private TMP_InputField displayNameInputField;
-
         [SerializeField]
         private TMP_InputField displayJoinInputField;
-
         [SerializeField]
         private GameObject errorPanel;
-
-        [SerializeField] 
+        [SerializeField]
         private TextMeshProUGUI textError;
-
-       
-
 
         private void Start()
         {
@@ -46,7 +39,6 @@ namespace StarterAssets
                 }
                 GameNetPortal.Instance.StartHost();
             }
-            
         }
 
         public async void OnClientClicked()
@@ -63,7 +55,6 @@ namespace StarterAssets
                     }
                     catch (Exception e)
                     {
-
                         errorPanel.SetActive(true);
                         textError.text = "Join code don't work";
                     }

@@ -9,7 +9,7 @@ public class Destruction : MonoBehaviour
 
     private float countdown;
     private bool hasExploaded = false;
-    
+
     public GameObject explosionEffect;
 
     void Start()
@@ -29,13 +29,11 @@ public class Destruction : MonoBehaviour
                 hasExploaded = true;
             }
         }
-
     }
 
     private void Explode()
     {
-        Instantiate(explosionEffect, transform.position,Quaternion.identity);
-
+        Instantiate(explosionEffect, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 }

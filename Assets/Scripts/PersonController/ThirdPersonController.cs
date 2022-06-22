@@ -16,48 +16,49 @@ namespace StarterAssets
 
     public class ThirdPersonController : NetworkBehaviour
     {
-        private float _terminalVelocity = 53.0f;
+        
+        
 
+        
 
-        [Tooltip("Move speed of the character in m/s")]
-        public float MoveSpeed = 2.0f;
-        [Tooltip("Sprint speed of the character in m/s")]
-        public float SprintSpeed = 5.335f;
-        [Header("Player Grounded")]
-        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
-        public bool Grounded = true;
-        [Tooltip("Useful for rough ground")]
-        public float GroundedOffset = -0.14f;
-        [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
-        public float GroundedRadius = 0.28f;
-        [Tooltip("What layers the character uses as ground")]
-        public LayerMask GroundLayers;
+        [Header("Player")]
+        private PlayerControlAsset playerInput;
+        private CharacterController playerController;
+        private Animator animator;
+        private InventoryWindow targetInventoryWindow;
+        private Item currentBonus;
         public Renderer myObject;
-        [SerializeField]
-        private float rotationSpeed = 2.5f;
         [SerializeField]
         private Transform gun;
         [SerializeField]
         private AudioSource auido;
+        private float _animationBlend;
 
+        [Space]
         [SerializeField]
-        private float _targetRotation = 0.0f;
-
-        private float _rotationVelocity;
-        private float _jumpTimeoutDelta;
-        private float _fallTimeoutDelta;
-
+        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
+        [SerializeField]
+        public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
+        [SerializeField]
+        public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
+        [SerializeField]
+        private NetworkObject Smoke;
+        [SerializeField]
+        private NetworkObject Slowdown;
+        [SerializeField]
+        private NetworkObject Stun;
         private NetworkVariable<bool> _flagVisibility = new NetworkVariable<bool>(true);
+
+        [Header("Player Grounded")]
+        [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
+        public bool Grounded = true;
+        private bool isPunch;
+        private bool isThrow;
+        private bool isJump;
+        private bool isDance;
         private bool _flagOldVisibility = true;
 
-        public float RotationSmoothTime = 0.12f;
-
-
-        private float _verticalVelocity;
-        private float _speed;
-        public float TopClamp = 70.0f;
-        public float JumpHeight = 1.2f;
-
+        [Header("Move")]
         [Tooltip("How far in degrees can you move the camera down")]
         public float BottomClamp = -30.0f;
         [Tooltip("The character uses its own gravity value. The engine default is -9.81f")]
@@ -67,62 +68,55 @@ namespace StarterAssets
         [Tooltip("For locking the camera position on all axis")]
         public bool LockCameraPosition = false;
         public GameObject CinemachineCameraTarget;
-        [Tooltip("Time required to perform the dance")]
-        public float DanceTimeout = 0.2f;
-        public float PunchTimeout = 0.1f;
-        public float TagTimeout = 0.1f;
-        [SerializeField]
-        public NetworkVariable<TimeSpan> timeTag = new NetworkVariable<TimeSpan>();
-        [SerializeField]
-        public NetworkVariable<bool> isTag = new NetworkVariable<bool>();
-        [Space(10)]
-        [Tooltip("Time required to pass before being able to jump again. Set to 0f to instantly jump again")]
-        public float JumpTimeout = 0.50f;
-        [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
-        public float FallTimeout = 0.15f;
-
-        public float SpeedChangeRate = 10.0f;
+        private GameObject _mainCamera;
         private const float _threshold = 0.01f;
         private float _cinemachineTargetYaw;
         private float _cinemachineTargetPitch;
-        private int _danceId;
-        private GameObject _mainCamera;
-        private bool _oldTag;
 
-        private float _animationBlend;
-        private bool isJump;
-        private bool isDance;
-
+        [Header("Camera")]
+        [Tooltip("Move speed of the character in m/s")]
+        public float MoveSpeed = 2.0f;
+        [Tooltip("Sprint speed of the character in m/s")]
+        public float SprintSpeed = 5.335f;
+        public float SpeedChangeRate = 10.0f;
+        public float TopClamp = 70.0f;
+        public float JumpHeight = 1.2f;
+        public float RotationSmoothTime = 0.12f;
+        [Tooltip("Useful for rough ground")]
+        public float GroundedOffset = -0.14f;
+        [Tooltip("The radius of the grounded check. Should match the radius of the CharacterController")]
+        public float GroundedRadius = 0.28f;
+        [Tooltip("What layers the character uses as ground")]
+        public LayerMask GroundLayers;
         [SerializeField]
-        private NetworkObject Smoke;
+        private float rotationSpeed = 2.5f;
         [SerializeField]
-        private NetworkObject Slowdown;
-        [SerializeField]
-        private NetworkObject Stun;
-
-        private NetworkObject bonus;
-        [SerializeField]
-        public NetworkVariable<NetworkString> nickName = new NetworkVariable<NetworkString>();
-
-        //public GameObject Granade;
-        private NetworkObject Inst;
-        public float PowerGranade = 10f;
-
-        private PlayerControlAsset playerInput;
-        private CharacterController playerController;
-        private Animator animator;
-        private InventoryWindow targetInventoryWindow;
-
+        private float _targetRotation = 0.0f;
         private Vector2 currentMovementInput;
+        private float _verticalVelocity;
+        private float _speed;
+        private float _rotationVelocity;
+        private float _terminalVelocity = 53.0f;
+
+        [Header("Timeout")]
+        public float JumpTimeout = 0.50f;
+        public float FallTimeout = 0.15f;
+        public float DanceTimeout = 0.2f;
+        public float PunchTimeout = 0.1f;
+        public float TagTimeout = 0.1f;
         private double _danceTimeoutDelta;
         private double _punchTimeoutDelta;
         private double _stunTimeoutDelta;
         private double _slowTimeoutDelta;
         private double _throwTimeoutDelta;
         private double _tagTimeoutDelta;
-        private bool isPunch;
-        private bool isThrow;
-        private Item currentBonus;
+        private float _jumpTimeoutDelta;
+        private float _fallTimeoutDelta;
+
+        [Space]
+        public float PowerGranade = 10f;
+        private int _danceId;
+        private bool _oldTag;
 
         void Awake()
         {
@@ -145,7 +139,6 @@ namespace StarterAssets
             playerInput.Player.Punch.canceled += OnPunch;
             playerInput.Player.Throw.started += OnThrow;
             playerInput.Player.Throw.canceled += OnThrow;
-
         }
 
         private void OnPunch(InputAction.CallbackContext obj)
@@ -172,7 +165,6 @@ namespace StarterAssets
         {
             Debug.Log(obj.ReadValue<Vector2>());
             currentMovementInput = obj.ReadValue<Vector2>();
-
         }
 
         private void Move()
@@ -262,7 +254,6 @@ namespace StarterAssets
                 }
                 animator.SetBool("Walk", true);
             }
-
         }
 
         private void TimeTagChange()
@@ -368,17 +359,15 @@ namespace StarterAssets
             {
                 if (_danceTimeoutDelta <= 0.0f && isDance)
                 {
-                        _danceTimeoutDelta = DanceTimeout;
-                        _danceId = Random.Range(1, 7);
-                        if (!IsServer)
-                        {
-                            UpdateAnimatorServerRpc("DanceID", _danceId);
-                            UpdateAnimatorServerRpc("Dance", true);
-                        }
-                        animator.SetFloat("DanceID", _danceId);
-                        animator.SetBool("Dance", true);
-                       
-
+                    _danceTimeoutDelta = DanceTimeout;
+                    _danceId = Random.Range(1, 7);
+                    if (!IsServer)
+                    {
+                        UpdateAnimatorServerRpc("DanceID", _danceId);
+                        UpdateAnimatorServerRpc("Dance", true);
+                    }
+                    animator.SetFloat("DanceID", _danceId);
+                    animator.SetBool("Dance", true);
                 }
                 if (_danceTimeoutDelta >= 0.0f)
                 {
@@ -396,13 +385,12 @@ namespace StarterAssets
                 }
             }
             else
-            { 
+            {
                 if (!IsServer)
                 {
                     UpdateAnimatorServerRpc("Dance", false);
                 }
                 animator.SetBool("Dance", false);
-
             }
         }
 
@@ -442,7 +430,6 @@ namespace StarterAssets
             {
                 if (_throwTimeoutDelta <= 0.0f)
                 {
-                    
                     currentBonus = targetInventoryWindow.targetInventory.inventoryItems.FirstOrDefault();
                     if (currentBonus == null)
                     {
@@ -453,7 +440,7 @@ namespace StarterAssets
                     switch (currentBonus.title)
                     {
                         case "InvisibilityPotion":
-                            
+
                             break;
                         default:
                             if (!IsServer)
@@ -461,11 +448,11 @@ namespace StarterAssets
                                 UpdateAnimatorServerRpc("Throw", true);
                             }
                             animator.SetBool("Throw", true);
-                            if(currentBonus.name== "BombStun")
+                            if (currentBonus.name == "BombStun")
                             {
-                                SpawnStunServerRpc(gun.position, gun.rotation, gun.forward,PowerGranade);
+                                SpawnStunServerRpc(gun.position, gun.rotation, gun.forward, PowerGranade);
                             }
-                            if (currentBonus.name=="Smoke")
+                            if (currentBonus.name == "Smoke")
                             {
                                 SpawnSmokeServerRpc(gun.position, gun.rotation, gun.forward, PowerGranade);
                             }
@@ -474,11 +461,9 @@ namespace StarterAssets
                                 SpawnSlowdownServerRpc(gun.position, gun.rotation, gun.forward, PowerGranade);
                             }
                             
-
                             break;
                     }
                 }
-               
             }
             if (!isThrow)
             {
@@ -526,9 +511,9 @@ namespace StarterAssets
         }
 
         [ServerRpc]
-        private void SpawnSmokeServerRpc(Vector3 position,Quaternion rotation,Vector3 forward,float power)
+        private void SpawnSmokeServerRpc(Vector3 position, Quaternion rotation, Vector3 forward, float power)
         {
-            NetworkObject ballInstance  = Instantiate(Smoke, position, rotation);
+            NetworkObject ballInstance = Instantiate(Smoke, position, rotation);
             ballInstance.SpawnWithOwnership(OwnerClientId);
             ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
         }
@@ -540,7 +525,6 @@ namespace StarterAssets
             NetworkObject ballInstance = Instantiate(Slowdown, position, rotation);
             ballInstance.SpawnWithOwnership(OwnerClientId);
             ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
-
         }
 
         [ServerRpc]
@@ -549,8 +533,6 @@ namespace StarterAssets
             NetworkObject ballInstance = Instantiate(Stun, position, rotation);
             ballInstance.SpawnWithOwnership(OwnerClientId);
             ballInstance.GetComponent<Rigidbody>().AddForce(forward * power, ForceMode.Impulse);
-
-
         }
 
 
@@ -643,7 +625,6 @@ namespace StarterAssets
                     }
                     animator.SetBool("Jump", true);
                     // update animator if using character
-
                 }
 
                 // jump timeout
@@ -669,7 +650,6 @@ namespace StarterAssets
                         UpdateAnimatorServerRpc("FreeFall", true);
                     }
                     animator.SetBool("FreeFall", true);
-
                 }
 
                 // if we are not grounded, do not jump
@@ -719,7 +699,6 @@ namespace StarterAssets
                             {
                                 _tagTimeoutDelta -= Time.deltaTime;
                             }
-
                         }
                     }
                     break;
@@ -733,7 +712,7 @@ namespace StarterAssets
             }
         }
 
-        [ServerRpc(Delivery=RpcDelivery.Unreliable)]
+        [ServerRpc(Delivery = RpcDelivery.Unreliable)]
         private void PlaySoundServerRpc()
         {
             auido.Play();

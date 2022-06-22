@@ -28,8 +28,6 @@ public class RelayManager : Singleton<RelayManager>
 
     public async Task<RelayHostData> SetupRelay()
     {
-        
-
         InitializationOptions options = new InitializationOptions()
             .SetEnvironmentName(environment);
 
@@ -63,8 +61,6 @@ public class RelayManager : Singleton<RelayManager>
 
     public async Task<RelayJoinData> JoinRelay(string joinCode)
     {
-        
-
         InitializationOptions options = new InitializationOptions()
             .SetEnvironmentName(environment);
 
@@ -91,8 +87,6 @@ public class RelayManager : Singleton<RelayManager>
 
         Transport.SetRelayServerData(relayJoinData.IPv4Address, relayJoinData.Port, relayJoinData.AllocationIDBytes,
             relayJoinData.Key, relayJoinData.ConnectionData, relayJoinData.HostConnectionData);
-
-        
 
         return relayJoinData;
     }

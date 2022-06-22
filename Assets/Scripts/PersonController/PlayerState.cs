@@ -13,8 +13,6 @@ namespace Assets.Scripts.PersonController
         Run,
         Jump,
         Punch,
-        Ground,
-        
+        Ground
     } 
-    
 }

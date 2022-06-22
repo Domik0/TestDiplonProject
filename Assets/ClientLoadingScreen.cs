@@ -6,19 +6,13 @@ public class ClientLoadingScreen : MonoBehaviour
 {
     [SerializeField]
     CanvasGroup m_CanvasGroup;
-
     [SerializeField]
     float m_DelayBeforeFadeOut = 0.5f;
-
     [SerializeField]
     float m_FadeOutDuration = 0.1f;
-
     bool m_LoadingScreenRunning;
-
     AsyncOperation m_LoadOperation;
-
     Coroutine m_FadeOutCoroutine;
-
 
     void Awake()
     {
@@ -56,7 +50,6 @@ public class ClientLoadingScreen : MonoBehaviour
             m_LoadOperation = loadOperation;
         }
     }
-
 
     IEnumerator FadeOutCoroutine()
     {

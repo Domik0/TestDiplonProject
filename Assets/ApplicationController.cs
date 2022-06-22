@@ -10,5 +10,4 @@ public class ApplicationController : MonoBehaviour
     {
         SceneManager.LoadScene("Scene_Menu");
     }
-
 }

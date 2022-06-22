@@ -14,10 +14,9 @@ public class DestroyEffect : NetworkBehaviour
         DestroyBonusServerRpc(bonus.duration);
     }
 
-
-    [ServerRpc(RequireOwnership =false)]
+    [ServerRpc(RequireOwnership = false)]
     void DestroyBonusServerRpc(float duration)
     {
-        Destroy(gameObject,duration);
+        Destroy(gameObject, duration);
     }
 }

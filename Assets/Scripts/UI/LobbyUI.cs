@@ -31,16 +31,15 @@ namespace StarterAssets
 
         public void Update()
         {
-            if (IsHost&&hostExists.Value&& lobbyPlayers.Count==1)
+            if (IsHost && hostExists.Value && lobbyPlayers.Count == 1)
             {
                 Debug.Log(lobbyPlayers.Count);
-               GameNetPortal.Instance.RequestDisconnect();
+                GameNetPortal.Instance.RequestDisconnect();
             }
         }
 
         public override void OnNetworkSpawn()
         {
-            
             if (IsClient)
             {
                 lobbyPlayers.OnListChanged += HandleLobbyPlayersStateChanged;
@@ -92,13 +91,10 @@ namespace StarterAssets
             return true;
         }
 
-
-
         /// <summary>
         /// Метод который срабатывает при подключения клиента
         /// </summary>
         /// <param name="clientId">Id клиента, который подключается</param>
-
         private void HandleClientConnected(ulong clientId)
         {
             var playerData = ServerGameNetPortal.Instance.GetPlayerData(clientId);
@@ -111,14 +107,12 @@ namespace StarterAssets
             ));
         }
 
-
         /// <summary>
         /// Срабатывает при отключения клиента
         /// </summary>
         /// <param name="clientId"></param>
         private void HandleClientDisconnect(ulong clientId)
         {
-           
             for (int i = 0; i < lobbyPlayers.Count; i++)
             {
                 if (lobbyPlayers[i].ClientId == clientId)
@@ -127,7 +121,6 @@ namespace StarterAssets
                     break;
                 }
             }
-          
         }
 
         /// <summary>
@@ -150,7 +143,6 @@ namespace StarterAssets
             }
         }
 
-
         [ClientRpc]
         private void DisconectCallbackClientRpc()
         {
@@ -168,9 +160,6 @@ namespace StarterAssets
             DisconectCallbackClientRpc();
         }
 
-       
-
-
         [ServerRpc(RequireOwnership = false)]
         private void StartGameServerRpc(ServerRpcParams serverRpcParams = default)
         {
@@ -178,12 +167,10 @@ namespace StarterAssets
             if (!IsEveryoneReady()) { return; }
             loadScreen.SetActive(true);
             ServerGameNetPortal.Instance.StartGame();
-           
         }
 
         public void OnLeaveClicked()
         {
-          
             if (IsHost)
             {
                 DisconectAllClientServerRpc();
@@ -192,20 +179,17 @@ namespace StarterAssets
             {
                 GameNetPortal.Instance.RequestDisconnect();
             }
-            
-
         }
 
         public void OnReadyClicked()
         {
             ToggleReadyServerRpc();
-        
         }
 
         public void OnStartGameClicked()
         {
             if (!IsEveryoneReady()) { return; }
-            
+
             StartGameServerRpc();
         }
 
@@ -235,7 +219,7 @@ namespace StarterAssets
                 }
             }
 
-            if(IsHost)
+            if (IsHost)
             {
                 startGameButton.interactable = IsEveryoneReady();
             }

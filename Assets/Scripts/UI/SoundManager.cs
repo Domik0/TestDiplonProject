@@ -9,9 +9,9 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.UI
 {
-    class SoundManager:MonoBehaviour
+    class SoundManager : MonoBehaviour
     {
-        [SerializeField] 
+        [SerializeField]
         Slider volumeSlider;
         [SerializeField]
         AudioMixer Mixer;
@@ -20,7 +20,7 @@ namespace Assets.Scripts.UI
         {
             if (!PlayerPrefs.HasKey("musicVolume"))
             {
-                PlayerPrefs.SetFloat("musicVolume",1);
+                PlayerPrefs.SetFloat("musicVolume", 1);
                 Load();
             }
             else
@@ -44,6 +44,5 @@ namespace Assets.Scripts.UI
         {
             PlayerPrefs.SetFloat("musicVolume", volumeSlider.value);
         }
-
     }
 }

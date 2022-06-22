@@ -16,5 +16,4 @@ namespace Assets.Scripts.Relay
         public byte[] ConnectionData;
         public byte[] Key;
     }
-
 }

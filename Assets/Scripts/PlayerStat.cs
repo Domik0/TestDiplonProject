@@ -24,7 +24,7 @@ namespace Assets.Scripts
         public bool Equals(PlayerStat other)
         {
             return PlayerName == other.PlayerName &&
-                   TimeTag.Equals(other.TimeTag) && PlayerNum==other.PlayerNum;
+                   TimeTag.Equals(other.TimeTag) && PlayerNum == other.PlayerNum;
         }
     }
 }

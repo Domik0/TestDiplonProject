@@ -88,7 +88,6 @@ namespace StarterAssets
         {
             gameInProgress = true;
             SceneLoaderWrapper.Instance.LoadScene("Scene_Main", true);
-            //  NetworkManager.Singleton.SceneManager.LoadScene("Scene_Main", LoadSceneMode.Single);
         }
 
         public void EndRound()
@@ -134,8 +133,6 @@ namespace StarterAssets
                 gameNetPortal.OnClientSceneChanged -= HandleClientSceneChanged;
             }
         }
-
-
 
         private void HandleClientSceneChanged(ulong clientId, int sceneIndex)
         {

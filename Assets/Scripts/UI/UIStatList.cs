@@ -14,18 +14,13 @@ namespace Assets.Scripts.UI
 {
     class UIStatList : NetworkSingleton<UIStatList>
     {
-
         public List<NetworkObject> ListGameObjects;
         public List<TextMeshProUGUI> listText;
-
         private List<ThirdPersonController> personsList = new List<ThirdPersonController>();
-
-        private  NetworkList<PlayerStat> cooList = new NetworkList<PlayerStat>();
-
+        private NetworkList<PlayerStat> cooList = new NetworkList<PlayerStat>();
 
         void Start()
         {
-
             if (IsServer)
             {
                 DestroyAllObjectServerRpc();
@@ -34,7 +29,7 @@ namespace Assets.Scripts.UI
                     personsList.Add(person.Value.PlayerObject.GetComponent<ThirdPersonController>());
                 }
 
-                personsList=  personsList.OrderBy(p => p.timeTag.Value).ToList();
+                personsList = personsList.OrderBy(p => p.timeTag.Value).ToList();
                 for (int i = 0; i < personsList.Count; i++)
                 {
                     if (personsList[i] != null)
@@ -51,8 +46,6 @@ namespace Assets.Scripts.UI
             GenerateStatPerson();
         }
 
-
-
         [ServerRpc]
         private void DestroyAllObjectServerRpc()
         {
@@ -63,16 +56,13 @@ namespace Assets.Scripts.UI
             }
         }
 
-
         private void GenerateStatPerson()
         {
             for (int i = 0; i < cooList.Count; i++)
             {
-
                 listText[i].gameObject.SetActive(true);
                 listText[i].text = $"{cooList[i].PlayerNum} {cooList[i].PlayerName.Value} {cooList[i].TimeTag.ToString(@"mm\:ss")}";
             }
-            
         }
 
         public void ExitClick()

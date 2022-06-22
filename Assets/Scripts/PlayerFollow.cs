@@ -6,7 +6,6 @@ using UnityEngine;
 
 public class PlayerFollow : Singleton<PlayerFollow>
 {
-
     [SerializeField]
     private CinemachineVirtualCamera cinemachineVirtualCamera;
 
@@ -18,6 +17,5 @@ public class PlayerFollow : Singleton<PlayerFollow>
     {
         if (cinemachineVirtualCamera == null) return;
         cinemachineVirtualCamera.Follow = transform;
-
     }
 }

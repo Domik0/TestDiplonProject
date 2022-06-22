@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.UI
 {
-    class Billboard:MonoBehaviour
+    class Billboard : MonoBehaviour
     {
         private Transform mainCameraTransform;
 
@@ -18,7 +18,8 @@ namespace Assets.Scripts.UI
 
         private void LateUpdate()
         {
-            transform.LookAt(transform.position+mainCameraTransform.rotation*Vector3.forward,mainCameraTransform.rotation*Vector3.up);
+            transform.LookAt(transform.position + mainCameraTransform.rotation * Vector3.forward,
+                mainCameraTransform.rotation * Vector3.up);
         }
     }
 }

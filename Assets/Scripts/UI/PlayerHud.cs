@@ -12,14 +12,11 @@ using UnityEngine;
 
 namespace Assets.Scripts.UI
 {
-    class PlayerHud:NetworkBehaviour
+    class PlayerHud : NetworkBehaviour
     {
-        [SerializeField]
-        private NetworkVariable<NetworkString> playerNetworkName = new NetworkVariable<NetworkString>();
-
+        [SerializeField] private NetworkVariable<NetworkString> playerNetworkName = new NetworkVariable<NetworkString>();
         [SerializeField] private Transform mainCameraTransform;
         [SerializeField] public GameObject billbord;
-
 
         private bool _overlaySet = false;
 
@@ -30,15 +27,11 @@ namespace Assets.Scripts.UI
 
         private void Start()
         {
-
             if (IsClient & IsOwner)
             {
-                
                 var x = gameObject.GetComponent<ThirdPersonController>().nickName.Value;
                 SetNicknameServerRpc(x);
             }
-
-
         }
 
         [ServerRpc]
@@ -47,13 +40,10 @@ namespace Assets.Scripts.UI
             playerNetworkName.Value = name;
         }
 
-
-
         public void SetOverlay()
         {
             var localPlayerOverlay = gameObject.GetComponentInChildren<TextMeshProUGUI>();
-            localPlayerOverlay.text =playerNetworkName.Value;
-            
+            localPlayerOverlay.text = playerNetworkName.Value;
         }
 
         public void Update()
@@ -63,20 +53,15 @@ namespace Assets.Scripts.UI
                 SetOverlay();
                 _overlaySet = true;
             }
-           
         }
 
         private void LateUpdate()
         {
             if (mainCameraTransform != null)
             {
-                //transform.position + mainCameraTransform.rotation * Vector3.forward, mainCameraTransform.rotation* Vector3.up
                 billbord.transform.LookAt(mainCameraTransform);
                 billbord.transform.Rotate(Vector3.up * 180);
             }
         }
-
-
-      
     }
 }

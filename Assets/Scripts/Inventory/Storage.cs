@@ -11,7 +11,7 @@ public class Storage : ScriptableObject
 
     public static Storage GetStorage()
     {
-        if(!instance)
+        if (!instance)
             instance = Resources.Load("Storage") as Storage;
         return instance;
     }

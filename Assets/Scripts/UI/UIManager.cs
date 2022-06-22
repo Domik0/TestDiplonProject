@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 public class UIManager : NetworkSingleton<UIManager>
 {
-    public NetworkVariable<bool> timerActive=new NetworkVariable<bool>();
+    public NetworkVariable<bool> timerActive = new NetworkVariable<bool>();
     private NetworkVariable<TimeSpan> currentTime = new NetworkVariable<TimeSpan>();
     private NetworkVariable<TimeSpan> startTime = new NetworkVariable<TimeSpan>();
     public int startMinutes;
@@ -47,7 +47,6 @@ public class UIManager : NetworkSingleton<UIManager>
             }
         }
         currentTimeText.text = currentTime.Value.ToString(@"mm\:ss");
-      
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -66,14 +65,12 @@ public class UIManager : NetworkSingleton<UIManager>
         Buttons.SetActive(true);
     }
 
-
     [ServerRpc(RequireOwnership = false)]
     public void StopTimeServerRpc()
     {
         timerActive.Value = false;
         SpawnManager.loudingCount.Value = 0;
     }
-
 
     public void ExitGame()
     {
@@ -86,7 +83,7 @@ public class UIManager : NetworkSingleton<UIManager>
                 player.Value = false;
             }
             StopTimeServerRpc();
-            
+
             SceneLoaderWrapper.Instance.LoadScene("Scene_EndGame", true);
         }
         else

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 namespace Assets.Scripts.Networking
 {
-    class SceneLoaderWrapper:NetworkSingleton<SceneLoaderWrapper>
+    class SceneLoaderWrapper : NetworkSingleton<SceneLoaderWrapper>
     {
         [SerializeField]
         ClientLoadingScreen m_ClientLoadingScreen;
@@ -38,7 +38,7 @@ namespace Assets.Scripts.Networking
             if (NetworkManager != null && NetworkManager.SceneManager != null)
             {
                 NetworkManager.SceneManager.OnSceneEvent -= OnSceneEvent;
-                
+
             }
         }
 
@@ -107,7 +107,7 @@ namespace Assets.Scripts.Networking
                         {
                             m_ClientLoadingScreen.StartLoadingScreen(sceneEvent.SceneName, sceneEvent.AsyncOperation);
                         }
-                      
+
                     }
                     break;
                 case SceneEventType.LoadEventCompleted: // Server told client that all clients finished loading a scene
@@ -127,11 +127,6 @@ namespace Assets.Scripts.Networking
                     break;
             }
         }
-
-
-
-
-
 
         [ClientRpc]
         void StopLoadingScreenClientRpc(ClientRpcParams clientRpcParams = default)
