@@ -15498,7 +15498,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timerActive:
     m_InternalValue: 0
-  startMinutes: 5
+  startMinutes: 1
   currentTimeText: {fileID: 1489409183}
   Buttons: {fileID: 1489409184}
 --- !u!4 &1016743992 stripped
