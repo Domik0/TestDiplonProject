@@ -5027,7 +5027,7 @@ Transform:
   - {fileID: 878459146}
   - {fileID: 2039564960}
   m_Father: {fileID: 0}
-  m_RootOrder: 9
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &319046183
 PrefabInstance:
@@ -15498,7 +15498,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   timerActive:
     m_InternalValue: 0
-  startMinutes: 1
+  startMinutes: 3
   currentTimeText: {fileID: 1489409183}
   Buttons: {fileID: 1489409184}
 --- !u!4 &1016743992 stripped
@@ -20151,7 +20151,7 @@ Transform:
   - {fileID: 191544736}
   - {fileID: 2087070921}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1364491329 stripped
 Transform:
@@ -28744,37 +28744,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 373fc854d939a1346a2f460d917cad73, type: 3}
---- !u!1 &1840128369
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1840128370}
-  m_Layer: 0
-  m_Name: chests
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1840128370
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1840128369}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.365768, y: 1.3172276, z: 12.85073}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 8
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!43 &1841451846
 Mesh:
   m_ObjectHideFlags: 0
